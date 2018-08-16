@@ -4,24 +4,13 @@ author:
 - affiliation: Aalborg University
   email: randrup@business.aau.dk
   footnote: Corresponding Author
-  name: Mikael Randrup Byrialsen
+  name: Mikael Randrup Byrialsen[^mikael]
 - affiliation: Aalborg University
   email: rs@business.aau.dk
-  name: Robert Ayerton Bailey Smith
+  name: Robert Ayerton Bailey Smith[^rob]
 date: "`r format(Sys.time(), '%B %d, %Y (%H:%M)')`"
 urlcolor: blue
 output:
-  bookdown::word_document2: 
-    reference_docx: mystyles.docx
-  bookdown::gitbook:
-    config:
-      toc:
-        collapse: section
-    self.contained: yes
-    split_by: none
-  bookdown::html_document2: default
-  rticles::elsevier_article: default
-  bookdown::epub_book: default
   bookdown::pdf_document2:
     citation_package: natbib
     fig_caption: yes
@@ -29,6 +18,17 @@ output:
     keep_tex: yes
     number_sections: yes
     toc: no
+  bookdown::epub_book: default
+  bookdown::html_document2: default
+  rticles::elsevier_article: default
+  bookdown::gitbook:
+    config:
+      toc:
+        collapse: section
+    self.contained: yes
+    split_by: none
+  bookdown::word_document2: 
+    reference_docx: mystyles.docx
 address:
 - address: MaMTEP, Department of Business and Management, Fibigerstr{\ae}de 2, Aalborg East
   code: 9220
@@ -1318,6 +1318,12 @@ SE_rolling_ts <- ts(SE_rolling_ts, start=(SE_start_year+years_rolling), freq=1)
 
 ```
 
+[^mikael]: Permanent address: MaMTEP, Department of Business and Management, 
+    Aalborg University, Fibigerstræde 2, Aalborg East, 
+    email: randrup\@business.aau.dk
+[^rob]: Permanent address: MaMTEP, Department of Business and Management, 
+    Aalborg University, Fibigerstræde 2, Aalborg East, 
+    email: rs\@business.aau.dk
 
 Introduction
 ============
@@ -1325,9 +1331,10 @@ Introduction
 [as some examples, @trehan1991; @blanchard2002; @bernanke2005; @blanchard2007; @vansteenkiste2008]
 @aliabbas2011
 @christensenetal1995
+@abildgren2013
 
 Why is investigating sectoral balances important from a historical point
-of view?
+of view? it is not interesting at all!!!
 
 The interaction between broader institutional sectors of the economy has
 captured the intrigue of economists and policy makers at least since
@@ -1429,7 +1436,7 @@ the System is more or less cut in stone. (Bergman 2015)
 Background
 ----------
 
-In Christensen et. al. (1995) a survey on the Nordic National Account
+In @christensenetal1995 a survey on the Nordic National Account
 since the 1880s is carried out. In that paper they date the first
 attempts to calculate the national income back to the end of the 19^th^
 century for Denmark and Norway and the beginning of the 20^th^ century
@@ -1437,8 +1444,8 @@ for Sweden. Although the main focus of the paper is on the development
 of the national account from the real side of the economy, the authors
 do mention however, that already in the 1930s Frisch emphasizes the
 importance in the distinction between real(goods and services) and
-financial objects(claims and counterclaims), Christensen et. al. (1995,
-35). Despite this point from Frisch, the financial side of the accounts
+financial objects(claims and counterclaims), @christensenetal1995 [p. 35]
+. Despite this point from Frisch, the financial side of the accounts
 didn't play a major role in the national account. The lack of
 information on the financial side of the economy, was not only a concern
 for Frisch, but also Copeland in the U.S. and Denitez in France:
@@ -1446,14 +1453,14 @@ for Frisch, but also Copeland in the U.S. and Denitez in France:
 >"When total purchases of our national product increase, where does the
 money come from to finance them? When purchases of our national
 product decline, what becomes of the money that is not spent?" 
-(Copeland, 1949, 254).
+@copeland1949 [p.254]
 
 This demand for information led to the development of the *flow of
 funds* accounts, which is now an integrated part of the system of
 national account. With the 1968-SNA standardization the financial
 balance sheet was added to the national account system, but not before
 SNA 93 guidelines for a fully specified system of financial accounts,
-including revaluation account, were given. (Abildgaard 2008)
+including revaluation account, were given. @abildgren2008
 
 In 1990 the Norwegian national account system was updated with the
 purpose of fulfilling the recommendations in the SNA 1993 and the
@@ -1480,7 +1487,7 @@ primo 1995. Regarding the non-financial sectoral national account, no
 existing version of Danish historical national-account provide sectoral
 accounts before 1971. The two dataset can be connected using the net
 lending from the non-financial side as financial net lending on the
-financial side of the economy[^4].
+financial side of the economy[^non-fin].
 
 In Bergman et. al (2010) the sectoral balances for the Swedish economy
 is discussed. The authors point out, that balance sheets didn't attract
@@ -1491,7 +1498,7 @@ Sweden also following the recommendations and standards in SNA 1993 and
 1995.
 
 In Sweden the Swedish National Wealth Database shows national wealth and
-sectoral net lending back to 1810, Waldenström (2017). From 1880 to 1901
+sectoral net lending back to 1810, @waldenstrom2016. From 1880 to 1901
 both Bollfras and Fahlbeck (Waldenström -- appendix) gave some estimates
 on the stock of wealth(and debt) in Sweden for the private sector and
 public sector in total. Their work did therefore not decompose the
@@ -1564,37 +1571,39 @@ as,(LOOK AT THE PAPER ABOUT STÜTZEL:
 $$V = V_{t - 1} + NL + CG$$
 
 where *V* is the net wealth, *NL* is net lending, and *CG* is any
-capital gains(or revaluations). As pointed out by Waldenström (2016) and
-Knudsen (2017) fluctuations in net wealth over time are mainly due to
+capital gains(or revaluations). As pointed out by @waldenstrom2016 and
+@knudsen2017 fluctuations in net wealth over time are mainly due to
 changes in net lending(net accumulation of financial assets) rather than
 capital gains, whereas short term fluctuations can be due to capital
 gains. Since the description of the three countries is based on the long
 term story, capital gains are ignored in this description.
+
+It is however important to point out, that while the equation for wealth accumulation above indicates, that *NL* affects wealth, the causality of course runs in both directions, since the *NL* also depends on the stock of wealth. This means, that in order to analyse the *NL* behaviour the financial status of a given sector also needs to be taken into account.  
 
 Literature Review
 -----------------
 
 Literature review on how sectoral balances are dealt with
 
-Theoretical aspects
--------------------
 
 The sectoral financial balances analysis (*SFB*), as a tool for
 analysis, has received some attention in recent years, and is based on
-the system of national accounts (SNA). The origin of standardized system
+the system of national accounts (SNA). The origin of standardised system
 of national accounts employed today can be traced back to James Meade
 and Richard Stone in the UK, and to Morris A. Copeland in the USA, who
 contributed greatly to the establishment of the 1953 United Nations
-System of National Accounts. xxx trace the development of the SNA back
-to an article published by Meade and Stone at the Great Britain Treasury
--- although the inspiration can also attributed further back to Keynes
-and many others such as François Quesnay. As noted by xxx, the initial
-interest of Copeland in the 1940s was to investigate the financing
-requirements of economic activity between and across the national
-sectors[^6]. The SFB approach could be described as a continuation of
-Copeland's goals with the aid of modern technology. The work of Wynne
-Godley together with other key authors is recognized by many economist
-as the instigating factor in the re-emergence of *SFB*. In light of the
+System of National Accounts. [@Rezai2017] trace the development of the
+SNA back to an article published by Meade and Stone at the Great Britain
+Treasury -- although the inspiration can also attributed further back to
+Keynes and many others such as François Quesnay. As noted by
+[@godleylavoie2012 p. 24], the initial interest of Copeland in the 1940s
+was to investigate the financing requirements of economic activity
+between and across the national sectors[^8]. The SFB approach could be
+described as a continuation of Copeland's goals with the aid of modern
+technology. The work of Wynne Godley together with other key authors
+[@godleycripps1983; @godleyzezza1989; @godleyzezza1992; @godley1999b; @godley1999a; @godley2004; @godleylavoie2001; @godleylavoie2012]
+is recognised by many economists [@bezemer2009; @fiebiger2013] as the
+instigating factor in the re-emergence of *SFB*. In light of the
 relatively recent availability of comprehensive and relatively accurate
 data on the financial side of the economy, Godley, together with several
 collaborators, conducted truly pioneering work in integrating the real
@@ -1606,17 +1615,19 @@ of the sectors is usually explained by either The Ricardian Equivalence
 Hypothesis (or rational expectations) (REH) or the Twin Deficit
 Hypothesis (TDH).
 
-The REH theory, introduced by xxx and more recently reviewed by xxx,
-explains that as *Govt* borrows, households (*Hh*), and *Pvt* in
-general, expect that *Govt* will need to repay its debt in the future.
-The key assumption in this case it is that *Pvt* is able to anticipate
-and interpret the impact of the net borrowing of *Govt* on their current
-and future consumption possibilities, and respond in a rational manner
-by 'smoothing' inter-temporal consumption patterns. The response is
-therefore to save in times when *Govt* increases spends.
+The REH theory, introduced by @barro1974 and more recently reviewed by
+[@ricciuti2003], explains that as *Govt* borrows, households (*Hh*), and
+*Pvt* in general, expect that *Govt* will need to repay its debt in the
+future. The key assumption in this case it is that *Pvt* is able to
+anticipate and interpret the impact of the net borrowing of *Govt* on
+their current and future consumption possibilities, and respond in a
+rational manner by 'smoothing' inter-temporal consumption patterns. The
+response is therefore to save in times when *Govt* increases spends.
 
-The Twin Deficits Hypothesis has been investigated extensively xxx, and
-in particular with respect to the US economy . According to this
+The Twin Deficits Hypothesis has been investigated extensively
+[@salvatore2006; @kimroubini2008; @giavazzi2010; @kalou2012; @nickel2014],
+and in particular with respect to the US economy
+[@trehan1991; @corsetti2008; @corsetti2012]. According to this
 hypothesis a clear link between current account deficits and negative
 *NL* in *Govt* should be identified. The key mechanism is connected to a
 tacit assumption of fully employed domestic resources. Therefore,
@@ -1628,14 +1639,13 @@ in domestic savings --- thus driving a simultaneous 'twin deficit' in
 additional *Govt* spending fail to improve the foreign balance, but will
 in fact deteriorate it further.
 
-Empirical Results
------------------
-
 Despite the fact that the sector balances are often discussed,
-surprisingly few empirical analyses can be found in the literature. In a
-recent paper, Glötz xxx, present an analysis that follows the work
-presented in xxx, where the test the REH and TDH against some empirical
-evidence. In xxx the analysis is carried out for 22 European countries
+surprisingly few empirical analyses can be found in the literature. In a 
+recent paper, @Rezai2017 present an analysis that follows the work
+presented by @Barbosa2006 and @Barbosa2008, where they test the REH and TDH 
+against some empirical evidence. 
+
+In @Rezai2017 the analysis is carried out for 22 European countries
 using quarterly data from 1999 to 2013. They show, how *NL* of the
 single sectors behaves with regards business cycles; their results are
 inconclusive and generally it depends on the chosen country. In their
@@ -1653,40 +1663,42 @@ counter-cyclical and *NL* of financial corporations is pro-cyclical,
 neither of which show significant patterns for Sweden. In , the REH and
 TDH are rejected, fully in line with the conclusion in xxx.
 
-In xxx a graphical presentation of *NL* of the five institutional
+In @Barbosa2006 a graphical presentation of *NL* of the five institutional
 sectors for both the US (for 1947-2004), and a panel of developing
 countries (for 1980-2002), is used to criticize the TDH and REH. The
 contradictory expectations are confirmed in a statistical analysis,
 where they use a variance-covariance analysis of *NL* and capacity
 utilization to reject the two hypotheses.
 
-xxx categorized the two theories as emerging from *Intra-temporal
-trade*, and *Inter-temporal responses* effects. The former describes the
-impact of fiscal policy on domestic demand, and thus relative purchasing
-power (or the real exchange rate) (TDH), and the latter describes
-Ricardian type inter-temporal adjustment by *Pvt* (REH). Their
-presentation allows for a more nuanced understanding of the
+@aliabbas2011 categorised the two theories as emerging from
+*Intra-temporal trade*, and *Inter-temporal responses* effects. The
+former describes the impact of fiscal policy on domestic demand, and
+thus relative purchasing power (or the real exchange rate) (TDH), and
+the latter describes Ricardian type inter-temporal adjustment by *Pvt*
+(REH). Their presentation allows for a more nuanced understanding of the
 effectiveness of different policies given prevailing conditions in trade
 and financial openness, and monetary/exchange rate regimes. The point of
-departure for their analysis is that They noted that such studies can be
-divided into three groups, the first, causality tests and VARs. Second,
-, and the third as a combination of narrative and regression analysis to
-examine the effects on the foreign balance. They drew a similar
-conclusion from a mixed method analysis, including a series of panel
-regressions, an analysis of large changes in fiscal and current account
-balances, and a quarterly structural VAR.
+departure for their [@aliabbas2011 p. 607] analysis is that They noted
+that such studies can be divided into three groups, the first, causality
+tests and VARs. Second, , and the third as a combination of narrative
+and regression analysis to examine the effects on the foreign balance.
+They drew a similar conclusion from a mixed method analysis, including a
+series of panel regressions, an analysis of large changes in fiscal and
+current account balances, and a quarterly structural VAR.
 
 These contributions are more focused on either the validity of TDH or
 REH in a group of countries or to explain the effect of i.e. fiscal
 policy in general. None of these papers try to provide information of
-specific event using the sectoral balances approach. In Van Treeck et.
-al., an empirical analysis of the three sector balance is used to
-discuss the possible outcomes of the Stability Pact program from
-2011-2014, where the authors seriously question the reliability of
-predicted results from the European Commission. Given the predictions of
-the growth rates in each economy and the assumption for the financial
-balance for *Govt* and *RoW*, they simulate and evaluate the implicitly
-assumed prediction for *Pvt*. In Brink(1983) he argues that the major
+specific event using the sectoral balances approach. In 
+@vantreeck2012, an empirical analysis of the three
+sector balance is used to discuss the possible outcomes of the Stability
+Pact program from 2011-2014, where the authors seriously question the
+reliability of predicted results from the European Commission. Given the
+predictions of the growth rates in each economy and the assumption for
+the financial balance for *Govt* and *RoW*, [@vantreeck2012] simulate
+and evaluate the implicitly assumed prediction for *Pvt*.
+
+@brink1983 argued that the major
 reason for the negative *Govt* *NL* in Denmark during the 1970s and
 1980s was due to low demand from abroad as a result of the global
 economic downturn and financial consolidation in *Pvt*, where the
@@ -1698,7 +1710,7 @@ effect on the balances in the private sector as well as the Rest of the
 World. In case of a lower propensity to import in the *Govt* compared to
 the private sector, an increase in the public consumption financed by an
 increase in taxes leads to an increase in *NL* in *Pvt*, while the *NL*
-in RoW falls(improvements of the current account). (Brink 1983).
+in RoW falls(improvements of the current account). @brink1983.
 
 BIS (2016) uses the banking crisis in Sweden in the early 1990s as a
 case for the relevance of sectoral balance approach. As a result of the
@@ -2148,7 +2160,6 @@ Results
 In this section we present a descriptive analysis of our results from
 the two statistical analyses described above.
 
-WHAT ABOUT A FIVE SECTOR?
 
 ### The composition of net lending
 
@@ -2236,89 +2247,6 @@ also negative, which has the consequence that a negative change in
 *Govt* is associated with a positive change in *Pvt*. The Swedish case
 thus provides some support for both the REH and TDH.
 
-### Business cycle covariance of sectors
-
-This analysis illustrates the covariance between the sector in question
-and the level of the output gap (*OG*) on an annual basis, for three
-lagged and three leading years. This analysis allows us to find the sign
-of the covariance between *NL* in a single sector and the *OG*, in order
-to say something about the behavior over the business cycles. It also
-lets us see if a positive or negative net position for the sector in
-question leads or lags the business cycle, where position $0$ indicates
-a concurrent movement between sector net position and the *OG*.
-
-The results of this three-sector business cycle covariance test are
-illustrated in Figure XX
-below.[^18]
-
-```{r buscycDK3sectlong, fig.cap="DK: Covariance", out.width="0.2\\linewidth", fig.height=5, fig.width=5, echo=FALSE, warning=FALSE, message=FALSE}
-
-plot(DK_CCF_Long$L,DK_CCF_Long$pvt,type="l",col=c("#ffc100"), lty=c(1),ylim=c(-1,1),ylab="Covariance",xlab="Lags")
-lines(DK_CCF_Long$L,DK_CCF_Long$g,type="l",col=c("#443eff"), lty=c(2))
-lines(DK_CCF_Long$L,DK_CCF_Long$row,type="l",col=c("#107831"), lty=c(3))
-lines(DK_CCF_Long$L,DK_CCF_Long$pvt_sig_points,type="p",col=c("#443eff"), pch=c(1))
-lines(DK_CCF_Long$L,DK_CCF_Long$g_sig_points,type="p",col=c("#443eff"), pch=c(2))
-lines(DK_CCF_Long$L,DK_CCF_Long$row_sig_points,type="p",col=c("#107831"), pch=c(3))
-grid()
-abline(h=0, col="#000000")
-legend("bottomright",col=c("#ffc100", "#443eff", "#107831"), lwd=1.75,lty=c(1:3), legend=c("Priv","Govt","RoW"),bty='n')
-``` 
-
-```{r buscycNO3sectlong, fig.cap="NO: Covariance", out.width="0.2\\linewidth", fig.height=5, fig.width=5, echo=FALSE, warning=FALSE, message=FALSE}
-
-plot(NO_CCF_Long$L,NO_CCF_Long$pvt,type="l",col=c("#ffc100"), lty=c(1),ylim=c(-1,1),ylab="Covariance",xlab="Lags")
-lines(NO_CCF_Long$L,NO_CCF_Long$g,type="l",col=c("#443eff"), lty=c(2))
-lines(NO_CCF_Long$L,NO_CCF_Long$row,type="l",col=c("#107831"), lty=c(3))
-lines(NO_CCF_Long$L,NO_CCF_Long$pvt_sig_points,type="p",col=c("#443eff"), pch=c(1))
-lines(NO_CCF_Long$L,NO_CCF_Long$g_sig_points,type="p",col=c("#443eff"), pch=c(2))
-lines(NO_CCF_Long$L,NO_CCF_Long$row_sig_points,type="p",col=c("#107831"), pch=c(3))
-grid()
-abline(h=0, col="#000000")
-legend("bottomright",col=c("#ffc100", "#443eff", "#107831"), lwd=1.75,lty=c(1:3), legend=c("Priv","Govt","RoW"),bty='n')
-``` 
-
-```{r buscycSE3sectlong, fig.cap="SE: Covariance", out.width="0.2\\linewidth", fig.height=5, fig.width=5, echo=FALSE, warning=FALSE, message=FALSE}
-
-plot(SE_CCF_Long$L,SE_CCF_Long$pvt,type="l",col=c("#ffc100"), lty=c(1),ylim=c(-1,1),ylab="Covariance",xlab="Lags")
-lines(SE_CCF_Long$L,SE_CCF_Long$g,type="l",col=c("#443eff"), lty=c(2))
-lines(SE_CCF_Long$L,SE_CCF_Long$row,type="l",col=c("#107831"), lty=c(3))
-lines(SE_CCF_Long$L,SE_CCF_Long$pvt_sig_points,type="p",col=c("#443eff"), pch=c(1))
-lines(SE_CCF_Long$L,SE_CCF_Long$g_sig_points,type="p",col=c("#443eff"), pch=c(2))
-lines(SE_CCF_Long$L,SE_CCF_Long$row_sig_points,type="p",col=c("#107831"), pch=c(3))
-grid()
-abline(h=0, col="#000000")
-legend("bottomright",col=c("#ffc100", "#443eff", "#107831"), lwd=1.75,lty=c(1:3), legend=c("Priv","Govt","RoW"),bty='n')
-``` 
-
-These results provide some useful information, despite the fact that the
-test for lags or leads do not show any clear patterns[^19]. All three
-countries have negative covariance between *Pvt* and *OG*. This
-indicates that an a positive *OG* is associated with negative *NL*,
-which can be interpret as pro-cyclical *NL* behaviour (the sector thus
-net-borrows as capacity utilization rises). *NL* of *Govt* is positively
-related with the *OG*, so that an increase in the *OG* is associated
-with positive *NL*. This can be interpret as counter-cyclical *NL*
-behaviour (or stabilization borrowing and spending by *Govt* during
-downturns, and vice versa for expansionary periods), as it dampens the
-business cycle. For *RoW* no clear story can be told, since the
-correlation values are mostly insignificant and the sign depends
-strongly on the chosen number of lags.
-
-The relevance of this analysis is to shed light on the likely behaviours
-of the sectors at different points of the business cycle. For example,
-if *Govt* is likely to spend (and borrow) counter-cyclically, and *Pvt*
-pro-cyclically, then a negative correlation between *Pvt* and *Govt* may
-exist in the absence of any rational expectations. The obscurity of the
-relationship between *RoW* and *OG* may also cause us to question the
-notion that expansions in aggregate demand necessarily lead to an
-increase in imports, as the TDH would have us believe. Equally, the
-counter-cyclical spending of *Govt* may have nothing to do with
-intentions, and could simply be the result of pro-cyclical changes in
-the level of tax income in conjunction with sticky expenditures. To help
-grasp some of these potential dependencies we construct a simple model
-that incorporates the three sectors, while satisfying the *NL* identity
-in Equation $ID.2$.
-
 Discussion
 ==========
 
@@ -2342,8 +2270,7 @@ relationships between these two sectors is insignificant in Norway. The
 covariances between *NL* for *Govt* and *RoW* in Norway is
 negative(supporting the TDH), while the relationships are insignificant
 for Denmark and Sweden. Does it mean, that if the *Pvt* NL increases in
-Denmark or Sweden, then the NL of the *Govt* automatic decreases? A good
-starting point for that discussion is to use an example from Sweden; the
+Denmark or Sweden, then the NL of the *Govt* automatic decreases? An often used example from Sweden of this relationship is the
 banking crisis in the early 1990s. As a result of the crisis, the
 private sector wanted to deleverage as recognized by BIS (2016), which
 can be seen by the positive net lending in the private sector in
@@ -2356,7 +2283,7 @@ sector in Sweden managed to improve the balance again. A contrast to the
 story in Sweden can be seen in Japan also in the beginning of the 1990s.
 After the crisis, only the non-financial corporations deleveraged, while
 the households still showed sectoral deficits and thereby continued to
-increase their stock of debt . Since only a part of the private sector
+increase their stock of debt. Since only a part of the private sector
 went through this deleveraging process initially, the public sectors
 weren't affected as much as in Sweden in the first place. On the other
 hand however, since the process of readjustment was extended over a
