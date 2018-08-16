@@ -1,0 +1,2411 @@
+---
+title: "Sectoral Balances: Historical developments in Scandinavia"
+author:
+- affiliation: Aalborg University
+  email: randrup@business.aau.dk
+  footnote: Corresponding Author
+  name: Mikael Randrup Byrialsen
+- affiliation: Aalborg University
+  email: rs@business.aau.dk
+  name: Robert Ayerton Bailey Smith
+date: "`r format(Sys.time(), '%B %d, %Y (%H:%M)')`"
+urlcolor: blue
+output:
+  bookdown::word_document2: default
+  bookdown::gitbook:
+    config:
+      toc:
+        collapse: section
+    self.contained: yes
+    split_by: none
+  bookdown::html_document2: default
+  rticles::elsevier_article: default
+  bookdown::pdf_document2:
+    citation_package: natbib
+    fig_caption: yes
+    dev: tikz
+    keep_tex: yes
+    number_sections: yes
+    toc: no
+  bookdown::epub_book: default
+address:
+- address: MaMTEP, Department of Business and Management, Fibigerstr{\ae}de 2, Aalborg East
+  code: 9220
+- address: MaMTEP, Department of Business and Management, Fibigerstr{\ae}de 2, Aalborg East
+  code: 9220
+journal: Scandinavian Economic History Review
+bibliography: Bibliography.bib
+biblio-style: apalike
+header-includes:
+- \usepackage{caption}
+- \usepackage{subfig}
+abstract: |
+  This paper explores the sectoral balances for Denmark, Norway and Sweden from a historical perspective. For each country, we examine the interactions amongst the three main sectors: the private sector, the public sector and the foreign sector. A common feature shared by these three economies is that they have persistently experienced surpluses on their current accounts for more than two decades. The three countries, however, diverge from each other when it comes to the composition of the excess domestic savings. In this paper we attempt to highlight these differences based on empirical facts using historical data. Using our empirical facts as a motivation, we set up a simplified theoretical model, which allows us to explain the differences amongst these three countries.
+---
+
+```{r global_options, include=FALSE, cache=FALSE}
+## Set some options for knitr that apply globally
+knitr::opts_chunk$set(cache=TRUE,
+                      message=FALSE,
+                      warning=FALSE,
+                      fig.width=4,
+                      fig.height=4,
+                      fig.cap="",
+                      par=TRUE)
+knitr::knit_hooks$set(par = function(before, options, envir) 
+    {if (before) par(mar = c(2, 2, 1, 1))
+    })
+
+set.seed(123)
+
+require(fpp)
+require(checkpoint)
+#require(codetools)
+#dir.create(".checkpoint")
+#checkpoint("2017-02-04",R.version="3.4.0",checkpointLocation=getwd())
+
+```
+
+
+```{r prepdata, echo=FALSE, warning=FALSE, include=FALSE}
+#############################################################################
+#############################################################################
+# This is a program to generate a the variance and covariance matrix for
+# net lending and GDP for Denmark, Norway and Sweden.
+# 
+# OECD data
+# =========
+# Data for the output gap is sourced form the OECD database, saved as a .csv
+# file and imported into the code.
+# 
+# Eurostat data
+# =============
+# Data for net lending and GDP are sourced directly from Eurostat, using the 
+# 'pdfetch' package.
+# 
+# 
+#############################################################################
+#############################################################################
+
+# Library the relevant packages for the R session
+
+library(plotrix)
+library(pdfetch)
+library(networkD3)
+library(knitr)
+library(rstudioapi)
+library(reshape2)
+library(ggplot2)
+library(mFilter)
+library(xtable)
+library(quantmod)
+library(Hmisc)
+library(dplyr)
+library(rsdmx)
+library(tidyr)
+library(extrafont)
+library(roll)
+library(data.table)
+
+loadfonts()
+loadfonts(device = "postscript")
+
+#############################################################################
+#############################################################################
+## Generic data check tools
+#############################################################################
+#############################################################################
+
+# ## To get the all possible data field download options
+# pdfetch_EUROSTAT_DSD(flowRef = "nasq_10_nf_tr")
+# 
+# ## To download the full dataset and inspect data
+# eurostatdatacheck <- get_eurostat(id = "nasq_10_nf_tr",  time_format = "num")
+
+#############################################################################
+## If running from R Studio: Check the current running directory of the code
+#############################################################################
+
+# setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+end_year_all <- 2016
+
+#############################################################################
+#############################################################################
+## Data Downloads
+#############################################################################
+#############################################################################
+
+#############################################################################
+##  Data download: Denmark
+#############################################################################
+# 
+## Net asset position of each sector
+# DK_eurostat_BF90_raw = pdfetch_EUROSTAT(flowRef = "nasa_10_f_bs", UNIT="MIO_NAC",
+#                                         NA_ITEM=c("BF90"),
+#                                         GEO="DK", CO_NCO="NCO", FINPOS="LIAB",
+#                                         SECTOR=c("S11","S12","S13","S14_S15","S2"))
+# 
+# # Transforming the obtained data into a data.frame
+# DK_eurostat_BF90<-as.data.frame(DK_eurostat_BF90_raw)
+# # Set column names to Sector Abbreviations
+# colnames(DK_eurostat_BF90)<-c("NFC","FC","Govt","HH","RoW")
+# DK_eurostat_BF90 <- ts(DK_eurostat_BF90, start = 1995, freq = 1)
+# DK_eurostat_BF90 <- data.frame(window(DK_eurostat_BF90, 1995, 2016, freq = 1))
+# 
+# ## Write/read DK_eurostat_BF90
+# ## Write/read DK_eurostat_BF90
+# write.csv2(DK_eurostat_BF90, "inputdata/DK_eurostat_BF90.csv")
+DK_eurostat_BF90 <- read.csv2("inputdata/DK_eurostat_BF90.csv", stringsAsFactors=FALSE)
+DK_eurostat_BF90 <- DK_eurostat_BF90 %>%
+    select("NFC", "FC", "Govt", "HH", "RoW")
+# Write/read DK_eurostat_BF90
+# Write/read DK_eurostat_BF90
+
+# # DENMARK ONLY back to 1995, so the rest of the data comes from ADAM
+# # Downloading the data by specifying the various filters
+# DK_eurostat_B9_raw = pdfetch_EUROSTAT(flowRef = "nasa_10_nf_tr", UNIT="CP_MNAC",
+#                                       NA_ITEM="B9", GEO="DK", DIRECT="PAID",
+#                                       SECTOR=c("S11","S12","S13","S14_S15","S2"))
+# 
+# # Transforming the obtained data into a data.frame
+# DK_eurostat_B9<-as.data.frame(DK_eurostat_B9_raw)
+# # Set column names to Sector Abbreviations
+# colnames(DK_eurostat_B9)<-c("NFC","FC","Govt","HH","RoW")
+# 
+# # Read B9 data from ADAM databank
+# # This data is unfortunately proprietary, and was purchased from the ADAM group.
+# DK_B9_ADAM_Long<-read.csv2("inputdata/ADAM_DK_B9.csv", sep=',',header=TRUE, text="Date", stringsAsFactors=FALSE)
+# DK_B9_ADAM_Long$Date <- as.Date(DK_B9_ADAM_Long[,1], format="%d/%m/%Y")
+# rownames(DK_B9_ADAM_Long) <- DK_B9_ADAM_Long$Date
+# DK_B9_ADAM_Long<-DK_B9_ADAM_Long[,-c(1)]
+#     DK_B9_ADAM_Long$RoW <- as.numeric(DK_B9_ADAM_Long$RoW)
+#     DK_B9_ADAM_Long$Govt <- as.numeric(DK_B9_ADAM_Long$Govt)
+#     DK_B9_ADAM_Long$HH <- as.numeric(DK_B9_ADAM_Long$HH)
+#     DK_B9_ADAM_Long$FC <- as.numeric(DK_B9_ADAM_Long$FC)
+#     DK_B9_ADAM_Long$NFC <- as.numeric(DK_B9_ADAM_Long$NFC)
+# DK_B9_ADAM_ts <- ts(DK_B9_ADAM_Long, start = 1970, end = 2015, freq = 1)
+# DK_B9_ADAM_short <- data.frame(window(DK_B9_ADAM_ts, 1975, 1994, freq = 1))
+# DK_B9_nominal <- rbind(DK_B9_ADAM_short,DK_eurostat_B9)
+# rownames(DK_B9_nominal) <- NULL
+# 
+# ## Write/read DK_B9_nominal
+# ## Write/read DK_B9_nominal
+# write.csv2(DK_B9_nominal, "inputdata/DK_B9_nominal.csv")
+DK_B9_nominal <- read.csv2("inputdata/DK_B9_nominal.csv", stringsAsFactors=FALSE)
+DK_B9_nominal <- DK_B9_nominal %>%
+    select("NFC", "FC", "Govt", "HH", "RoW")
+# Write/read DK_B9_nominal
+# Write/read DK_B9_nominal
+
+DK_B9_nominal_ts <- ts(DK_B9_nominal, start = 1975, end = end_year_all, freq =1)
+DK_B9_nominal <- data.frame(DK_B9_nominal_ts)
+
+# # Collect GDP data from Eurostat
+# DK_eurostat_gdp_raw = pdfetch_EUROSTAT(flowRef = "nama_10_gdp",UNIT=c("CP_MNAC"),
+#                                        NA_ITEM="B1GQ",  GEO="DK", SECTOR="S1", DIRECT="PAID")
+# DK_gdp_Long<-as.numeric(DK_eurostat_gdp_raw)
+# DK_gdp_Long_ts <- ts(DK_gdp_Long, start = 1975, end = end_year_all, freq = 1)
+# DK_gdp_Long <- data.frame(DK_gdp_Long_ts)
+# 
+# ## Write/read DK_gdp_Long
+# ## Write/read DK_gdp_Long
+# write.csv2(DK_gdp_Long, "inputdata/DK_gdp_Long.csv")
+DK_gdp_Long <- read.csv2("inputdata/DK_gdp_Long.csv", stringsAsFactors=FALSE)
+DK_gdp_Long <- DK_gdp_Long %>%
+    select("DK_gdp_Long_ts")
+DK_gdp_Long <- as.numeric(DK_gdp_Long$DK_gdp_Long_ts)
+DK_gdp_Long_ts <- ts(DK_gdp_Long, start = 1975, end = end_year_all, freq = 1)
+# Write/read DK_gdp_Long
+# Write/read DK_gdp_Long
+
+# Net asset position for each sector as proportion of GDP
+DK_gdp_calc_BF90 <- as.vector(window(DK_gdp_Long_ts, 1995, end_year_all, freq = 1))
+DK_eurostat_BF90 <- DK_eurostat_BF90/DK_gdp_calc_BF90 * 100
+DK_eurostat_BF90_3sector <- DK_eurostat_BF90 %>%
+    as_tibble() %>% mutate(
+        Pvt = NFC + FC + HH,
+        NFC = NULL,
+        FC = NULL,
+        HH = NULL
+    ) %>%
+    select(RoW, Govt, Pvt)
+
+
+DK_eurostat_BF90_5sector_ts <- ts(DK_eurostat_BF90, start = 1995, end = end_year_all, freq=1)
+DK_eurostat_BF90_3sector_ts <- ts(DK_eurostat_BF90_3sector, start = 1995, end = end_year_all, freq=1)
+rm(DK_eurostat_BF90_3sector)
+rm(DK_gdp_calc_BF90)
+rm(DK_eurostat_BF90)
+
+# # Collect real GDP data from Eurostat
+# DK_eurostat_realGDP_raw <-  pdfetch_EUROSTAT(flowRef = "naida_10_gdp", UNIT="CLV_I10",
+#                                              NA_ITEM="B1GQ", GEO="DK", FREQ="A",
+#                                              SECTOR=c("S1"))
+# DK_real_gdp <- as.data.frame(DK_eurostat_realGDP_raw)
+# colnames(DK_real_gdp)<-c("DK_real_gdp")
+# 
+# DK_real_gdp<-as.numeric(DK_real_gdp$DK_real_gdp)
+# DK_real_gdp_ts <- ts(DK_real_gdp, start = 1975, end = end_year_all, freq = 1)
+# DK_real_gdp <- data.frame(DK_real_gdp_ts)
+# 
+# 
+# ## Write/read DK_real_gdp
+# ## Write/read DK_real_gdp
+# write.csv2(DK_real_gdp, "inputdata/DK_real_gdp.csv")
+DK_real_gdp <- read.csv2("inputdata/DK_real_gdp.csv", stringsAsFactors=FALSE)
+DK_real_gdp <- DK_real_gdp %>%
+    select("DK_real_gdp_ts")
+DK_real_gdp <- as.numeric(DK_real_gdp$DK_real_gdp)
+DK_real_gdp_ts <- ts(DK_real_gdp, start = 1975, end = end_year_all, freq = 1)
+# Write/read DK_real_gdp
+# Write/read DK_real_gdp
+
+
+#############################################################################
+##  Data download: Norway
+#############################################################################
+
+# # Net asset position of each sector
+# NO_eurostat_BF90_raw = pdfetch_EUROSTAT(flowRef = "nasa_10_f_bs", UNIT="MIO_NAC",
+#                                         NA_ITEM=c("BF90"),
+#                                         GEO="NO", CO_NCO="NCO", FINPOS="LIAB",
+#                                         SECTOR=c("S11","S12","S13","S14_S15","S2"))
+# 
+# # Transforming the obtained data into a data.frame
+# NO_eurostat_BF90<-as.data.frame(NO_eurostat_BF90_raw)
+# # Set column names to Sector Abbreviations
+# colnames(NO_eurostat_BF90)<-c("NFC","FC","Govt","HH","RoW")
+# NO_eurostat_BF90 <- ts(NO_eurostat_BF90, start = 1995, freq = 1)
+# NO_eurostat_BF90 <- data.frame(window(NO_eurostat_BF90, 1995, end_year_all, freq = 1))
+# 
+# ## Write/read NO_eurostat_BF90
+# ## Write/read NO_eurostat_BF90
+# write.csv2(NO_eurostat_BF90, "inputdata/NO_eurostat_BF90.csv")
+NO_eurostat_BF90 <- read.csv2("inputdata/NO_eurostat_BF90.csv", stringsAsFactors=FALSE)
+NO_eurostat_BF90 <- NO_eurostat_BF90 %>%
+    select("NFC", "FC", "Govt", "HH", "RoW")
+# Write/read NO_eurostat_BF90
+# Write/read NO_eurostat_BF90
+
+# # Downloading the data by specifying the various filters
+# NO_eurostat_B9_raw = pdfetch_EUROSTAT(flowRef = "nasa_10_nf_tr", UNIT="CP_MNAC",
+#                                       NA_ITEM="B9", GEO="NO",
+#                                       DIRECT="PAID",
+#                                       SECTOR=c("S11","S12","S13","S14_S15","S2"))
+# # Transforming the obtained data into a data.frame
+# NO_B9_nominal<-as.data.frame(ts(NO_eurostat_B9_raw), start = 1978, end = end_year_all, freq = 1)
+# # Set column names to Sector Abbreviations
+# colnames(NO_B9_nominal)<-c("NFC","FC","Govt","HH","RoW")
+# rownames(NO_B9_nominal) <- NULL
+# NO_B9_nominal_ts <- ts(NO_B9_nominal, start = 1978, end = end_year_all, freq =1)
+# NO_B9_nominal <- data.frame(NO_B9_nominal_ts)
+# 
+# ## Write/read NO_B9_nominal
+# ## Write/read NO_B9_nominal
+# write.csv2(NO_B9_nominal, "inputdata/NO_B9_nominal.csv")
+NO_B9_nominal <- read.csv2("inputdata/NO_B9_nominal.csv", stringsAsFactors=FALSE)
+NO_B9_nominal <- NO_B9_nominal %>%
+    select("NFC", "FC", "Govt", "HH", "RoW")
+NO_B9_nominal_ts <- ts(NO_B9_nominal, start = 1978, end = end_year_all, freq =1)
+NO_B9_nominal <- data.frame(NO_B9_nominal_ts)
+## Write/read NO_B9_nominal
+## Write/read NO_B9_nominal
+
+
+# # Collect GDP data from Eurostat
+# NO_eurostat_gdp_raw = pdfetch_EUROSTAT(flowRef = "nasa_10_nf_tr",UNIT=c("CP_MNAC"),
+#                                        NA_ITEM="B1GQ", GEO="NO", SECTOR="S1", DIRECT="PAID")
+# NO_gdp_Long<-as.numeric(NO_eurostat_gdp_raw)
+# NO_gdp_Long_ts <- ts(NO_gdp_Long, start = 1978, end = end_year_all, freq = 1)
+# NO_gdp_Long <- data.frame(NO_gdp_Long_ts)
+# 
+# ## Write/read NO_gdp_Long
+# ## Write/read NO_gdp_Long
+# write.csv2(NO_gdp_Long, "inputdata/NO_gdp_Long.csv")
+NO_gdp_Long <- read.csv2("inputdata/NO_gdp_Long.csv", stringsAsFactors=FALSE)
+NO_gdp_Long <- NO_gdp_Long %>%
+    select("NO_gdp_Long_ts")
+NO_gdp_Long_ts <- ts(NO_gdp_Long$NO_gdp_Long_ts, start = 1978, end = end_year_all, freq = 1)
+NO_gdp_Long <- as.numeric(NO_gdp_Long$NO_gdp_Long_ts)
+## Write/read NO_gdp_Long   
+## Write/read NO_gdp_Long
+
+
+# Net asset position for each sector as proportion of GDP
+NO_gdp_calc_BF90 <- as.vector(window(NO_gdp_Long_ts, 1995, end_year_all, freq = 1))
+NO_eurostat_BF90 <- NO_eurostat_BF90/NO_gdp_calc_BF90 * 100
+NO_eurostat_BF90_3sector <- NO_eurostat_BF90 %>%
+    as_tibble() %>% mutate(
+        Pvt = NFC + FC + HH,
+        NFC = NULL,
+        FC = NULL,
+        HH = NULL
+    ) %>%
+    select(RoW, Govt, Pvt)
+
+NO_eurostat_BF90_5sector_ts <- ts(NO_eurostat_BF90, start = 1995, end = end_year_all, freq=1)
+NO_eurostat_BF90_3sector_ts <- ts(NO_eurostat_BF90_3sector, start = 1995, end = end_year_all, freq=1)
+rm(NO_eurostat_BF90_3sector)
+rm(NO_gdp_calc_BF90)
+rm(NO_eurostat_BF90)
+
+# # Collect real GDP data from Eurostat
+# NO_eurostat_real_gdp_raw <-  pdfetch_EUROSTAT(flowRef = "naida_10_gdp", UNIT="CLV_I10",
+#                                              NA_ITEM="B1GQ", GEO="NO", FREQ="A",
+#                                              SECTOR=c("S1"))
+# NO_real_gdp <- data.frame(ts(as.data.frame(NO_eurostat_real_gdp_raw), start = 1975, end = end_year_all, freq = 1))
+# colnames(NO_real_gdp)<-c("NO_real_gdp")
+# 
+# ## Write/read NO_real_gdp
+# ## Write/read NO_real_gdp
+# write.csv2(NO_real_gdp, "inputdata/NO_real_gdp.csv")
+NO_real_gdp <- read.csv2("inputdata/NO_real_gdp.csv", stringsAsFactors=FALSE)
+NO_real_gdp <- NO_real_gdp %>%
+    select("NO_real_gdp")
+NO_real_gdp <- as.numeric(NO_real_gdp$NO_real_gdp)
+NO_real_gdp_ts <- ts(NO_real_gdp, start = 1975, end = end_year_all, freq = 1)
+## Write/read NO_real_gdp
+## Write/read NO_real_gdp
+
+
+#############################################################################
+##  Data download: Sweden
+#############################################################################
+
+# # Net asset position of each sector
+# SE_eurostat_BF90_raw = pdfetch_EUROSTAT(flowRef = "nasa_10_f_bs", UNIT="MIO_NAC",
+#                                         NA_ITEM=c("BF90"),
+#                                         GEO="SE", CO_NCO="NCO", FINPOS="LIAB",
+#                                         SECTOR=c("S11","S12","S13","S14_S15","S2"))
+# 
+# # Transforming the obtained data into a data.frame
+# SE_eurostat_BF90<-as.data.frame(SE_eurostat_BF90_raw)
+# # Set column names to Sector Abbreviations
+# colnames(SE_eurostat_BF90)<-c("NFC","FC","Govt","HH","RoW")
+# SE_eurostat_BF90 <- ts(SE_eurostat_BF90, start = 1995, freq = 1)
+# SE_eurostat_BF90 <- data.frame(window(SE_eurostat_BF90, 1995, end_year_all, freq = 1))
+# 
+# ## Write/read SE_eurostat_BF90
+# ## Write/read SE_eurostat_BF90
+# write.csv2(SE_eurostat_BF90, "inputdata/SE_eurostat_BF90.csv")
+SE_eurostat_BF90 <- read.csv2("inputdata/SE_eurostat_BF90.csv", stringsAsFactors=FALSE)
+SE_eurostat_BF90 <- SE_eurostat_BF90 %>%
+    select("NFC", "FC", "Govt", "HH", "RoW")
+## Write/read SE_eurostat_BF90
+## Write/read SE_eurostat_BF90
+
+# # Downloading the data by specifying the various filters
+# SE_eurostat_B9_raw = pdfetch_EUROSTAT(flowRef = "nasa_10_nf_tr", UNIT="CP_MNAC",
+#                                       NA_ITEM="B9", GEO="SE",
+#                                       DIRECT="PAID",
+#                                       SECTOR=c("S11","S12","S13","S14_S15","S2"))
+# # Transforming the obtained data into a data.frame
+# SE_B9_nominal<-as.data.frame(SE_eurostat_B9_raw)
+# # Set column names to Sector Abbreviations
+# colnames(SE_B9_nominal)<-c("NFC","FC","Govt","HH","RoW")
+# # Set variable as the sum of counterpart sectors of Govt
+# SE_counterpart_sum<-0-(SE_B9_nominal$RoW+SE_B9_nominal$FC+SE_B9_nominal$NFC+SE_B9_nominal$HH)
+# SE_B9_nominal$Govt<-SE_counterpart_sum
+# rownames(SE_B9_nominal) <- NULL
+# SE_B9_nominal <- as.data.frame(ts(SE_B9_nominal, start = 1950, end = end_year_all, freq = 1))
+# SE_B9_nominal_ts <- ts(SE_B9_nominal, start = 1950, end = end_year_all, freq =1)
+# SE_B9_nominal <- data.frame(SE_B9_nominal_ts)
+# 
+# ## Write/read SE_B9_nominal
+# ## Write/read SE_B9_nominal
+# write.csv2(SE_B9_nominal, "inputdata/SE_B9_nominal.csv")
+SE_B9_nominal <- read.csv2("inputdata/SE_B9_nominal.csv", stringsAsFactors=FALSE)
+SE_B9_nominal <- SE_B9_nominal %>%
+    select("NFC", "FC", "Govt", "HH", "RoW")
+SE_B9_nominal_ts <- ts(SE_B9_nominal, start = 1950, end = end_year_all, freq =1)
+SE_B9_nominal <- data.frame(SE_B9_nominal_ts)
+## Write/read SE_B9_nominal
+## Write/read SE_B9_nominal
+
+# # Collect GDP data from Eurostat
+# SE_eurostat_gdp_raw = pdfetch_EUROSTAT(flowRef = "nasa_10_nf_tr",UNIT=c("CP_MNAC"),
+#                                        NA_ITEM="B1GQ", GEO="SE", SECTOR="S1", DIRECT="PAID")
+# SE_gdp_Long<-as.numeric(SE_eurostat_gdp_raw)
+# SE_gdp_Long_ts <- ts(SE_gdp_Long, start = 1950, end = end_year_all, freq = 1)
+# SE_gdp_Long <- data.frame(SE_gdp_Long_ts)
+# 
+# ## Write/read SE_gdp_Long
+# ## Write/read SE_gdp_Long
+# write.csv2(SE_gdp_Long, "inputdata/SE_gdp_Long.csv")
+SE_gdp_Long <- read.csv2("inputdata/SE_gdp_Long.csv", stringsAsFactors=FALSE)
+SE_gdp_Long <- SE_gdp_Long %>%
+    select("SE_gdp_Long_ts")
+SE_gdp_Long <- as.numeric(SE_gdp_Long$SE_gdp_Long_ts)
+SE_gdp_Long_ts <- ts(SE_gdp_Long, start = 1950, end = end_year_all, freq = 1)
+## Write/read SE_gdp_Long   
+## Write/read SE_gdp_Long
+
+# Net asset position for each sector as proportion of GDP
+SE_gdp_calc_BF90 <- as.vector(window(SE_gdp_Long_ts, 1995, end_year_all, freq = 1))
+SE_eurostat_BF90 <- SE_eurostat_BF90/SE_gdp_calc_BF90 * 100
+SE_eurostat_BF90_3sector <- SE_eurostat_BF90 %>%
+    as_tibble() %>% mutate(
+        Pvt = NFC + FC + HH,
+        NFC = NULL,
+        FC = NULL,
+        HH = NULL
+    ) %>%
+    select(RoW, Govt, Pvt)
+
+SE_eurostat_BF90_5sector_ts <- ts(SE_eurostat_BF90, start = 1995, end = end_year_all, freq=1)
+SE_eurostat_BF90_3sector_ts <- ts(SE_eurostat_BF90_3sector, start = 1995, end = end_year_all, freq=1)
+rm(SE_eurostat_BF90_3sector)
+rm(SE_gdp_calc_BF90)
+rm(SE_eurostat_BF90)
+
+# # Import price index data, Swedish living cost index 1914-2017
+# # http://www.statistikdatabasen.scb.se/pxweb/en/ssd/START__PR__PR0101__PR0101A/KPILevindexAr/?rxid=96001e4d-5998-4678-b1ad-a9e29e4d4b0e
+# SE_price_index_raw<-read.csv2("inputdata/SE_price_index.csv",sep=";",header=T)
+# SE_price_index <- as.data.frame(SE_price_index_raw$SE_price_index)
+# colnames(SE_price_index) <- c("SE_price_index")
+# SE_price_index_ts <- ts(SE_price_index, start = 1950, end = end_year_all, freq = 1)
+# Value_at_2010 <- as.numeric(window(SE_price_index_ts, 2010, 2010, freq = 1))
+# 
+# # Normalise prices at 2010 level
+# SE_price_index <- SE_price_index$SE_price_index/Value_at_2010*100
+# 
+# # Calculate Swedish real GDP index
+# # Scale nominal GDP by price index
+# SE_real_gdp <- as.data.frame(SE_gdp_Long_ts/SE_price_index*100)
+# colnames(SE_real_gdp) <- c("SE_real_gdp")
+# SE_real_gdp_ts <- ts((as.numeric(SE_real_gdp$SE_real_gdp)), start = 1950, end = end_year_all, freq = 1)
+# Value_at_2010_nominal <- as.numeric(window(SE_real_gdp_ts, 2010, 2010, freq = 1))
+# # Normalise at 2010 value
+# SE_real_gdp$SE_real_gdp <- SE_real_gdp$SE_real_gdp/Value_at_2010_nominal*100
+# SE_real_gdp_index_ts <- ts(as.numeric(SE_real_gdp$SE_real_gdp), start = 1950, end = end_year_all, freq = 1)
+# SE_real_gdp_index <- data.frame(SE_real_gdp_index_ts)
+# rm(SE_price_index_raw)
+# 
+# ## Write/read SE_real_gdp
+# ## Write/read SE_real_gdp
+# write.csv2(SE_real_gdp_index, "inputdata/SE_real_gdp_index.csv")
+SE_real_gdp <- read.csv2("inputdata/SE_real_gdp_index.csv", stringsAsFactors=FALSE)
+SE_real_gdp <- SE_real_gdp %>%
+    select("SE_real_gdp_index_ts")
+SE_real_gdp_index <- as.numeric(SE_real_gdp$SE_real_gdp_index_ts)
+SE_real_gdp_index_ts <- ts(SE_real_gdp_index, start = 1950, end = end_year_all, freq = 1)
+## Write/read SE_real_gdp
+## Write/read SE_real_gdp
+
+
+#############################################################################
+##  Import Non-Financial Transactions data
+#############################################################################
+DK_country_data <- read.csv2("inputdata/DK_country_data.csv", stringsAsFactors=FALSE)
+DK_country_data <- DK_country_data[, -c(1)]
+DK_country_data_ts <- ts(DK_country_data, start = 1995, end = end_year_all, freq = 1)
+
+NO_country_data <- read.csv2("inputdata/NO_country_data.csv", stringsAsFactors=FALSE)
+NO_country_data <- NO_country_data[, -c(1)]
+NO_country_data_ts <- ts(NO_country_data, start = 1978, end = end_year_all, freq = 1)
+
+SE_country_data <- read.csv2("inputdata/SE_country_data.csv", stringsAsFactors=FALSE)
+SE_country_data <- SE_country_data[, -c(1)]
+SE_country_data_ts <- ts(SE_country_data, start = 1950, end = end_year_all, freq = 1)
+SE_country_data_ts <- window(SE_country_data_ts, 1995, end_year_all, freq = 1)
+
+
+#############################################################################
+##  Normalize net lending (B9) data as a proportion of GDP
+#############################################################################
+
+DK_B9_Long<-(DK_B9_nominal/DK_gdp_Long)*100
+NO_B9_Long<-(NO_B9_nominal/NO_gdp_Long)*100
+SE_B9_Long<-(SE_B9_nominal/SE_gdp_Long)*100
+
+#############################################################################
+##  Create 3 sector net lending data for each country, Long
+#############################################################################
+# Denmark
+DK_B9_Long_3sector <- DK_B9_Long %>%
+    as_tibble() %>% mutate(
+        Pvt = NFC + FC + HH,
+        NFC = NULL,
+        FC = NULL,
+        HH = NULL
+    ) %>%
+    select(RoW, Govt, Pvt)
+
+# Norway
+NO_B9_Long_3sector <- NO_B9_Long %>%
+    as_tibble() %>% mutate(
+        Pvt = NFC + FC + HH,
+        NFC = NULL,
+        FC = NULL,
+        HH = NULL
+    ) %>%
+    select(RoW, Govt, Pvt)
+
+# Sweden
+SE_B9_Long_3sector <- SE_B9_Long %>%
+    as_tibble() %>% mutate(
+        Pvt = NFC + FC + HH,
+        NFC = NULL,
+        FC = NULL,
+        HH = NULL
+    ) %>%
+    select(RoW, Govt, Pvt)
+
+
+#############################################################################
+##  Create time series objects for all Long data
+#############################################################################
+
+DK_B9_Long_5sector_ts <- ts(DK_B9_Long, start = 1975, end = end_year_all, freq=1)
+DK_B9_Long_3sector_ts <- ts(DK_B9_Long_3sector, start = 1975, end = end_year_all, freq=1)
+
+NO_B9_Long_5sector_ts <- ts(NO_B9_Long, start = 1978, end = end_year_all, freq=1)
+NO_B9_Long_3sector_ts <- ts(NO_B9_Long_3sector, start = 1978, end = end_year_all, freq=1)
+
+SE_B9_Long_5sector_ts <- ts(SE_B9_Long, start=(1950), end = end_year_all, freq=1)
+SE_B9_Long_3sector_ts <- ts(SE_B9_Long_3sector, start=(1950), end = end_year_all, freq=1)
+
+# Pre 1985
+DK_B9_Pre1985_5sector_ts <- window(DK_B9_Long_5sector_ts, 1975, 1984, freq=1)
+DK_B9_Pre1985_3sector_ts <- window(DK_B9_Long_3sector_ts, 1975, 1984, freq=1)
+
+NO_B9_Pre1985_5sector_ts <- window(NO_B9_Long_5sector_ts, 1978, 1984, freq=1)
+NO_B9_Pre1985_3sector_ts <- window(NO_B9_Long_3sector_ts, 1978, 1984, freq=1)
+
+SE_B9_Pre1985_5sector_ts <- window(SE_B9_Long_5sector_ts, 1950, 1984, freq=1)
+SE_B9_Pre1985_3sector_ts <- window(SE_B9_Long_3sector_ts, 1950, 1984, freq=1)
+
+# Post 1985
+DK_B9_Post1985_5sector_ts <- window(DK_B9_Long_5sector_ts, 1985, freq=1)
+DK_B9_Post1985_3sector_ts <- window(DK_B9_Long_3sector_ts, 1985, freq=1)
+
+NO_B9_Post1985_5sector_ts <- window(NO_B9_Long_5sector_ts, 1985, freq=1)
+NO_B9_Post1985_3sector_ts <- window(NO_B9_Long_3sector_ts, 1985, freq=1)
+
+SE_B9_Post1985_5sector_ts <- window(SE_B9_Long_5sector_ts, 1985, freq=1)
+SE_B9_Post1985_3sector_ts <- window(SE_B9_Long_3sector_ts, 1985, freq=1)
+
+
+#############################################################################
+##  Value checks for the co-variance analysis
+#############################################################################
+
+# 
+# Check_NO_B9 <- NO_B9_nominal$NFC + NO_B9_nominal$FC + NO_B9_nominal$Govt + NO_B9_nominal$HH + NO_B9_nominal$RoW
+# Check_DK_B9 <- DK_B9_nominal$NFC + DK_B9_nominal$FC + DK_B9_nominal$Govt + DK_B9_nominal$HH + DK_B9_nominal$RoW
+# Check_SE_B9 <- SE_B9_nominal$NFC + SE_B9_nominal$FC + SE_B9_nominal$Govt + SE_B9_nominal$HH + SE_B9_nominal$RoW
+# # Check_NO_B9
+# # Check_DK_B9
+# # Check_SE_B9
+# # 
+# # 
+# Check_NO <- NO_B9_Long$NFC + NO_B9_Long$FC + NO_B9_Long$Govt + NO_B9_Long$HH + NO_B9_Long$RoW
+# Check_DK <- DK_B9_Long$NFC + DK_B9_Long$FC + DK_B9_Long$Govt + DK_B9_Long$HH + DK_B9_Long$RoW
+# Check_SE <- SE_B9_Long$NFC + SE_B9_Long$FC + SE_B9_Long$Govt + SE_B9_Long$HH + SE_B9_Long$RoW
+# # Check_NO
+# # Check_DK
+# # Check_SE
+
+#############################################################################
+#############################################################################
+##  Share price index data: OECD data import
+#############################################################################
+#############################################################################
+# OECD_shareprice_url <- "http://stats.oecd.org/restsdmx/sdmx.ashx/GetData/MEI/AUT+BEL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+IRL+ITA+LVA+LUX+NLD+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+EA19+EU28+A5M.SPASTT01+SPINTT01.ST+STSA+IXOB+IXOBSA+NCCU+NCCUSA+CXCU+CXCUSA.A/all?startTime=2010&endTime=2016"
+# 
+# OECD_shareprice <- as.data.frame(readSDMX(OECD_shareprice_url))
+# OECD_SP_all <- OECD_shareprice %>%
+#     filter(SUBJECT=="SPASTT01") %>%
+#     select(LOCATION, obsValue, obsTime) %>%
+#     arrange(LOCATION) %>%
+#     spread(LOCATION, obsValue)
+# 
+# OECD_share_prices_ts <- ts(OECD_SP_all[, -c(1)], start = 2010, end = end_year_all, freq=1)
+
+# ## Write/read OECD_share_prices_ts
+# ## Write/read OECD_share_prices_ts
+# write.csv2(OECD_share_prices_ts, "inputdata/OECD_share_prices_ts.csv")
+OECD_share_prices_ts <- read.csv2("inputdata/OECD_share_prices_ts.csv", stringsAsFactors=FALSE)
+OECD_share_prices_ts <- OECD_share_prices_ts[, -c(1)]
+OECD_share_prices_ts <- ts(OECD_share_prices_ts, start = 2010, end = end_year_all, freq = 1)
+## Write/read OECD_share_prices_ts
+## Write/read OECD_share_prices_ts
+
+
+#############################################################################
+#############################################################################
+##  Output Gap data: OECD data import
+#############################################################################
+#############################################################################
+
+# # Read data for output gap from OECD (limited to 1985-2016)
+# # http://stats.oecd.org/Index.aspx?QueryId=51655#
+# OECD_outputgap_url <- "http://stats.oecd.org/restsdmx/sdmx.ashx/GetData/EO/DNK+NOR+SWE.GAP.A/all?startTime=1985&endTime=2017"
+# OECD_outputgap <- as.data.frame(readSDMX(OECD_outputgap_url))
+# outputgap_oecd <- OECD_outputgap %>%
+#     select(LOCATION, obsValue,obsTime) %>%
+#     arrange(LOCATION) %>%
+#     spread(LOCATION, obsValue)
+# outputgap_oecd <- outputgap_oecd[,-c(1)]
+# rm(OECD_outputgap_url)
+# rm(OECD_outputgap)
+
+# ## Write/read outputgap_oecd
+# ## Write/read outputgap_oecd
+# write.csv2(outputgap_oecd, "inputdata/outputgap_oecd.csv")
+outputgap_oecd <- read.csv2("inputdata/outputgap_oecd.csv", stringsAsFactors=FALSE)
+outputgap_oecd <- outputgap_oecd[, -c(1)]
+outputgap_oecd_ts <- ts(outputgap_oecd, start = 1985, end = end_year_all, freq = 1)
+## Write/read outputgap_oecd
+## Write/read outputgap_oecd
+
+# Create time series of output gap data for each country
+outputgap_oecd_DK_ts<-ts(outputgap_oecd$DNK,start = 1985, end = end_year_all, freq = 1)
+outputgap_oecd_NO_ts<-ts(outputgap_oecd$NOR,start = 1985, end = end_year_all, freq = 1)
+outputgap_oecd_SE_ts<-ts(outputgap_oecd$SWE,start = 1985, end = end_year_all, freq = 1)
+
+
+#############################################################################
+#############################################################################
+##  Output gap data: Hodrick-Prescott filter calculations
+#############################################################################
+#############################################################################
+# Requires the mFilter package
+
+#############################################################################
+##  Denmark
+#############################################################################
+# Calculate real GDP
+# Run HP filter on Denmark
+opar <- par(no.readonly=TRUE)
+DK_trend_gdp_Long <- hpfilter(DK_real_gdp, freq=28,type="frequency",drift=TRUE)
+
+# Plot the output of the HP filter for Denmark
+# plot(DK_trend_gdp_Long)
+
+# Set output gap to a dataframe and time series for plotting
+DK_trend_gdp_Long$outputgap_gdp <- DK_trend_gdp_Long$cycle/DK_real_gdp*100
+outputgap_eurostat_Long_DK_ts <- ts(as.numeric(DK_trend_gdp_Long$outputgap_gdp), start = 1975, end = end_year_all, freq = 1)
+
+# Covert calculated output gap to a time series
+outputgap_eurostat_Post1985_DK_ts <- window(outputgap_eurostat_Long_DK_ts, 1985, end_year_all, freq = 1)
+
+#############################################################################
+##  Norway
+#############################################################################
+# Calculate real GDP
+# Run HP filter on Denmark
+opar <- par(no.readonly=TRUE)
+NO_trend_gdp_Long <- hpfilter(NO_real_gdp, freq=24,type="frequency",drift=TRUE)
+
+# Plot the output of the HP filter for Norway
+# plot(NO_trend_real_gdp)
+
+# Set output gap to a dataframe and time series for plotting
+NO_trend_gdp_Long$outputgap_gdp <- NO_trend_gdp_Long$cycle/NO_real_gdp*100
+outputgap_eurostat_Long_NO_ts <- ts(as.numeric(NO_trend_gdp_Long$outputgap_gdp), start = 1975, end = end_year_all, freq = 1)
+
+# Time-series from 1978
+outputgap_eurostat_78_NO_ts <- window(outputgap_eurostat_Long_NO_ts, 1978, end_year_all, freq = 1)
+
+
+# Time-Series from 1985
+outputgap_eurostat_Post1985_NO_ts <- window(outputgap_eurostat_Long_NO_ts, 1985, end_year_all, freq = 1)
+
+#############################################################################
+##  Sweden
+#############################################################################
+# Calculate real GDP
+# Run HP filter on Denmark
+opar <- par(no.readonly=TRUE)
+SE_trend_real_gdp <- hpfilter(SE_real_gdp_index, freq=18,type="frequency",drift=TRUE)
+
+# Plot the output of the HP filter for Sweden
+# plot(SE_trend_real_gdp)
+
+# Set output gap to a dataframe and time series for plotting
+SE_trend_real_gdp$outputgap_gdp <- SE_trend_real_gdp$cycle/SE_real_gdp_index*100
+outputgap_eurostat_Long_SE_ts <- ts(as.numeric(SE_trend_real_gdp$outputgap_gdp), start = 1950, end = end_year_all, freq = 1)
+
+
+
+# Covert calculated output gap to a time series
+outputgap_eurostat_Post1985_SE_ts <- window(outputgap_eurostat_Long_SE_ts, 1985, end_year_all, freq = 1)
+
+
+#############################################################################
+#############################################################################
+##  Create 3 sector net lending (B9), plus output gap data for each 
+##  country, Pre1985, Post1985 and Long datasets
+#############################################################################
+#############################################################################
+outputgap_eurostat_Pre1985_DK_ts <- window(outputgap_eurostat_Long_DK_ts, end=1984, freq=1)
+outputgap_eurostat_Pre1985_SE_ts <- window(outputgap_eurostat_Long_SE_ts, end=1984, freq=1)
+outputgap_eurostat_Pre1985_NO_ts <- window(outputgap_eurostat_Long_NO_ts, start = 1978, end=1984, freq=1)
+
+#############################################################################
+## Pre1985 data sets: 3 sector
+#############################################################################
+
+DK_B9_Pre1985_3sector_og_ts <- cbind(DK_B9_Pre1985_3sector_ts, outputgap_eurostat_Pre1985_DK_ts)
+colnames(DK_B9_Pre1985_3sector_og_ts) <- c((colnames(DK_B9_Pre1985_3sector_ts)),"OGap")
+
+NO_B9_Pre1985_3sector_og_ts <- cbind(NO_B9_Pre1985_3sector_ts, outputgap_eurostat_Pre1985_NO_ts)
+colnames(NO_B9_Pre1985_3sector_og_ts) <- c((colnames(NO_B9_Pre1985_3sector_ts)),"OGap")
+
+SE_B9_Pre1985_3sector_og_ts <- cbind(SE_B9_Pre1985_3sector_ts, outputgap_eurostat_Pre1985_SE_ts)
+colnames(SE_B9_Pre1985_3sector_og_ts) <- c((colnames(SE_B9_Pre1985_3sector_ts)),"OGap")
+
+#############################################################################
+## Post1985 data sets: 3 sector
+#############################################################################
+
+DK_B9_Post1985_3sector_og_ts <- cbind(DK_B9_Post1985_3sector_ts, outputgap_oecd_DK_ts)
+colnames(DK_B9_Post1985_3sector_og_ts) <- c((colnames(DK_B9_Post1985_3sector_ts)),"OGap")
+
+NO_B9_Post1985_3sector_og_ts <- cbind(NO_B9_Post1985_3sector_ts, outputgap_oecd_NO_ts)
+colnames(NO_B9_Post1985_3sector_og_ts) <- c((colnames(NO_B9_Post1985_3sector_ts)),"OGap")
+
+SE_B9_Post1985_3sector_og_ts <- cbind(SE_B9_Post1985_3sector_ts, outputgap_oecd_SE_ts)
+colnames(SE_B9_Post1985_3sector_og_ts) <- c((colnames(SE_B9_Post1985_3sector_ts)),"OGap")
+
+#############################################################################
+## Long data sets: 3 sector
+#############################################################################
+DK_B9_Long_3sector_og_ts <- cbind(DK_B9_Long_3sector_ts, outputgap_eurostat_Long_DK_ts)
+colnames(DK_B9_Long_3sector_og_ts) <- c((colnames(DK_B9_Long_3sector_ts)),"OGap")
+
+NO_B9_Long_3sector_og_ts <- cbind(NO_B9_Long_3sector_ts, outputgap_eurostat_78_NO_ts)
+colnames(NO_B9_Long_3sector_og_ts) <- c((colnames(NO_B9_Long_3sector_ts)),"OGap")
+
+SE_B9_Long_3sector_og_ts <- cbind(SE_B9_Long_3sector_ts, outputgap_eurostat_Long_SE_ts)
+colnames(SE_B9_Long_3sector_og_ts) <- c((colnames(SE_B9_Long_3sector_ts)),"OGap")
+
+#############################################################################
+## Pre1985 data sets: 5 sector
+#############################################################################
+
+DK_B9_Pre1985_5sector_og_ts <- cbind(DK_B9_Pre1985_5sector_ts, outputgap_eurostat_Pre1985_DK_ts)
+colnames(DK_B9_Pre1985_5sector_og_ts) <- c((colnames(DK_B9_Pre1985_5sector_ts)),"OGap")
+
+NO_B9_Pre1985_5sector_og_ts <- cbind(NO_B9_Pre1985_5sector_ts, outputgap_eurostat_Pre1985_NO_ts)
+colnames(NO_B9_Pre1985_5sector_og_ts) <- c((colnames(NO_B9_Pre1985_5sector_ts)),"OGap")
+
+SE_B9_Pre1985_5sector_og_ts <- cbind(SE_B9_Pre1985_5sector_ts, outputgap_eurostat_Pre1985_SE_ts)
+colnames(SE_B9_Pre1985_5sector_og_ts) <- c((colnames(SE_B9_Pre1985_5sector_ts)),"OGap")
+
+#############################################################################
+## Post1985 data sets: 5 sector
+#############################################################################
+
+DK_B9_Post1985_5sector_og_ts <- cbind(DK_B9_Post1985_5sector_ts, outputgap_oecd_DK_ts)
+colnames(DK_B9_Post1985_5sector_og_ts) <- c((colnames(DK_B9_Post1985_5sector_ts)),"OGap")
+
+NO_B9_Post1985_5sector_og_ts <- cbind(NO_B9_Post1985_5sector_ts, outputgap_oecd_NO_ts)
+colnames(NO_B9_Post1985_5sector_og_ts) <- c((colnames(NO_B9_Post1985_5sector_ts)),"OGap")
+
+SE_B9_Post1985_5sector_og_ts <- cbind(SE_B9_Post1985_5sector_ts, outputgap_oecd_SE_ts)
+colnames(SE_B9_Post1985_5sector_og_ts) <- c((colnames(SE_B9_Post1985_5sector_ts)),"OGap")
+
+#############################################################################
+## Long data sets: 5 sector
+#############################################################################
+DK_B9_Long_5sector_og_ts <- cbind(DK_B9_Long_5sector_ts, outputgap_eurostat_Long_DK_ts)
+colnames(DK_B9_Long_5sector_og_ts) <- c((colnames(DK_B9_Long_5sector_ts)),"OGap")
+
+NO_B9_Long_5sector_og_ts <- cbind(NO_B9_Long_5sector_ts, outputgap_eurostat_78_NO_ts)
+colnames(NO_B9_Long_5sector_og_ts) <- c((colnames(NO_B9_Long_5sector_ts)),"OGap")
+
+SE_B9_Long_5sector_og_ts <- cbind(SE_B9_Long_5sector_ts, outputgap_eurostat_Long_SE_ts)
+colnames(SE_B9_Long_5sector_og_ts) <- c((colnames(SE_B9_Long_5sector_ts)),"OGap")
+
+#############################################################################
+#############################################################################
+## Create time series for comparative plots of output gaps
+#############################################################################
+#############################################################################
+DK_outputgap_ts <- cbind(outputgap_eurostat_Long_DK_ts, outputgap_oecd_DK_ts)
+NO_outputgap_ts <- cbind(outputgap_eurostat_Long_NO_ts, outputgap_oecd_NO_ts)
+SE_outputgap_ts <- cbind(outputgap_eurostat_Long_SE_ts, outputgap_oecd_SE_ts)
+#############################################################################
+#############################################################################
+## Create time series for all variables to be used in the covariance analysis
+#############################################################################
+#############################################################################
+
+#############################################################################
+#############################################################################
+##  Correlation test between net lending (B9) and the output gap
+##  for each country: Data limited to 1985 - 2016
+#############################################################################
+#############################################################################
+# Set total lags
+lags_n <- 3
+
+# Set up function to add stars to significant values
+sig_star <- function(x,y){
+    ifelse(x<0.01, paste(formatC(y, dig=2, format="f"), "***"), 
+           ifelse(x<0.05, paste(formatC(y, dig=2, format="f"), "**"), 
+                  ifelse(x<0.1, paste(formatC(y, dig=2, format="f"), "*"), 
+                         paste(formatC(y, dig=2, format="f")))))
+}
+
+sig_points <- function(x,y){
+    ifelse(x<0.1, y, NA) 
+}
+
+ccf_func <- function(df, df_3sectors, df_og){
+    
+    ccf_result_h <- ccf(df[, 'HH'], df_og, lag.max=lags_n,type="correlation",pl=FALSE)
+    ccf_result_nf <- ccf(df[, 'NFC'], df_og, lag.max=lags_n,type="correlation",pl=FALSE)
+    ccf_result_f <- ccf(df[, 'FC'], df_og, lag.max=lags_n,type="correlation",pl=FALSE)
+    ccf_result_g <- ccf(df[, 'Govt'], df_og, lag.max=lags_n,type="correlation",pl=FALSE)
+    ccf_result_row <- ccf(df[, 'RoW'], df_og, lag.max=lags_n,type="correlation",pl=FALSE)
+    ccf_result_pvt <- ccf(df_3sectors[, 'Pvt'], df_og, lag.max=lags_n,type="correlation",pl=FALSE)
+
+    h <- (as.data.frame(ccf_result_h[["acf"]]))[[1]]
+    nf <- (as.data.frame(ccf_result_nf[["acf"]]))[[1]]
+    f <- (as.data.frame(ccf_result_f[["acf"]]))[[1]]
+    g <- (as.data.frame(ccf_result_g[["acf"]]))[[1]]
+    row <- (as.data.frame(ccf_result_row[["acf"]]))[[1]]
+    pvt <- (as.data.frame(ccf_result_pvt[["acf"]]))[[1]]
+    
+    dat <- as.data.frame(cbind(h, nf, f, g, row, pvt))
+    
+    n.used <- ccf_result_h[["n.used"]]
+    
+    dat$h_p <-  2 * (1 - pnorm(abs(h), mean = 0, sd = 1/sqrt(n.used)))
+    dat$nf_p <-  2 * (1 - pnorm(abs(nf), mean = 0, sd = 1/sqrt(n.used)))
+    dat$f_p <-  2 * (1 - pnorm(abs(f), mean = 0, sd = 1/sqrt(n.used)))
+    dat$g_p <-  2 * (1 - pnorm(abs(g), mean = 0, sd = 1/sqrt(n.used)))
+    dat$row_p <-  2 * (1 - pnorm(abs(row), mean = 0, sd = 1/sqrt(n.used)))
+    dat$pvt_p <-  2 * (1 - pnorm(abs(pvt), mean = 0, sd = 1/sqrt(n.used)))
+    
+    dat$L<-c((-1*lags_n):lags_n)
+    
+    dat$h_sig <- sig_star(dat$h_p, dat$h)
+    dat$nf_sig <- sig_star(dat$nf_p, dat$nf)
+    dat$f_sig <- sig_star(dat$f_p, dat$f)
+    dat$g_sig <- sig_star(dat$g_p, dat$g)
+    dat$row_sig <- sig_star(dat$row_p, dat$row)
+    dat$pvt_sig <- sig_star(dat$pvt_p, dat$pvt)
+    
+    dat$h_sig_points <- sig_points(dat$h_p, dat$h)
+    dat$nf_sig_points <- sig_points(dat$nf_p, dat$nf)
+    dat$f_sig_points <- sig_points(dat$f_p, dat$f)
+    dat$g_sig_points <- sig_points(dat$g_p, dat$g)
+    dat$row_sig_points <- sig_points(dat$row_p, dat$row)
+    dat$pvt_sig_points <- sig_points(dat$pvt_p, dat$pvt)
+    
+    return(dat)
+}
+
+sig_ccf_table_5sector <- function(df){
+    df <- df %>%
+        mutate(
+            HH = h_sig,
+            NFC = nf_sig,
+            FC = f_sig,
+            Govt = g_sig,
+            RoW = row_sig,
+            Pvt = pvt_sig
+        ) %>%
+        select(HH, NFC, FC, Govt, RoW)
+    rownamelist <- c(-lags_n:lags_n)
+    rownames(df) <- rownamelist
+    return(df)
+}
+
+sig_ccf_table_3sector <- function(df){
+    
+    df <- df %>%
+        mutate(
+            Govt = g_sig,
+            RoW = row_sig,
+            Pvt = pvt_sig
+        ) %>%
+        select(Pvt, Govt, RoW)
+    rownamelist <- c(-lags_n:lags_n)
+    rownames(df) <- rownamelist
+    return(df)
+}
+
+# Denmark
+DK_CCF_Pre1985 <- ccf_func(DK_B9_Pre1985_5sector_og_ts, DK_B9_Pre1985_3sector_og_ts, outputgap_eurostat_Pre1985_DK_ts)
+DK_CCF_Post1985 <- ccf_func(DK_B9_Post1985_5sector_og_ts, DK_B9_Post1985_3sector_og_ts, outputgap_oecd_DK_ts)
+DK_CCF_Long <- ccf_func(DK_B9_Long_5sector_og_ts, DK_B9_Long_3sector_og_ts, outputgap_eurostat_Long_DK_ts)
+
+DK_CCF_Pre1985_starvals_5sector <- sig_ccf_table_5sector(DK_CCF_Pre1985)
+DK_CCF_Post1985_starvals_5sector <- sig_ccf_table_5sector(DK_CCF_Post1985)
+DK_CCF_Long_starvals_5sector <- sig_ccf_table_5sector(DK_CCF_Long)
+DK_CCF_Pre1985_starvals_3sector <- sig_ccf_table_3sector(DK_CCF_Pre1985)
+DK_CCF_Post1985_starvals_3sector <- sig_ccf_table_3sector(DK_CCF_Post1985)
+DK_CCF_Long_starvals_3sector <- sig_ccf_table_3sector(DK_CCF_Long)
+
+
+# Norway
+NO_CCF_Pre1985 <- ccf_func(NO_B9_Pre1985_5sector_og_ts, NO_B9_Pre1985_3sector_og_ts, outputgap_eurostat_Pre1985_NO_ts)
+NO_CCF_Post1985 <- ccf_func(NO_B9_Post1985_5sector_og_ts, NO_B9_Post1985_3sector_og_ts, outputgap_oecd_NO_ts)
+NO_CCF_Long <- ccf_func(NO_B9_Long_5sector_og_ts, NO_B9_Long_3sector_og_ts, outputgap_eurostat_Long_NO_ts)
+
+NO_CCF_Pre1985_starvals_5sector <- sig_ccf_table_5sector(NO_CCF_Pre1985)
+NO_CCF_Post1985_starvals_5sector <- sig_ccf_table_5sector(NO_CCF_Post1985)
+NO_CCF_Long_starvals_5sector <- sig_ccf_table_5sector(NO_CCF_Long)
+NO_CCF_Pre1985_starvals_3sector <- sig_ccf_table_3sector(NO_CCF_Pre1985)
+NO_CCF_Post1985_starvals_3sector <- sig_ccf_table_3sector(NO_CCF_Post1985)
+NO_CCF_Long_starvals_3sector <- sig_ccf_table_3sector(NO_CCF_Long)
+
+
+# Sweden
+SE_CCF_Pre1985 <- ccf_func(SE_B9_Pre1985_5sector_og_ts, SE_B9_Pre1985_3sector_og_ts, outputgap_eurostat_Pre1985_SE_ts)
+SE_CCF_Post1985 <- ccf_func(SE_B9_Post1985_5sector_og_ts, SE_B9_Post1985_3sector_og_ts, outputgap_oecd_SE_ts)
+SE_CCF_Long <- ccf_func(SE_B9_Long_5sector_og_ts, SE_B9_Long_3sector_og_ts, outputgap_eurostat_Long_SE_ts)
+
+SE_CCF_Pre1985_starvals_5sector <- sig_ccf_table_5sector(SE_CCF_Pre1985)
+SE_CCF_Post1985_starvals_5sector <- sig_ccf_table_5sector(SE_CCF_Post1985)
+SE_CCF_Long_starvals_5sector <- sig_ccf_table_5sector(SE_CCF_Long)
+SE_CCF_Pre1985_starvals_3sector <- sig_ccf_table_3sector(SE_CCF_Pre1985)
+SE_CCF_Post1985_starvals_3sector <- sig_ccf_table_3sector(SE_CCF_Post1985)
+SE_CCF_Long_starvals_3sector <- sig_ccf_table_3sector(SE_CCF_Long)
+
+#############################################################################
+# Correlation coefficients
+#############################################################################
+#############################################################################
+#Pre-1985 dataset
+
+rcorr_func <- function(df){
+    cor_result <- rcorr(df, type="pearson")
+    cor_result$star_vals <- sig_star(cor_result$P, cor_result$r)
+    cor_result$sig_cor_vals <- sig_points(cor_result$P, cor_result$r)
+    return(cor_result)
+}
+
+rcorr_starvals <- function(df){
+    cor_result <- rcorr(df, type="pearson")
+    cor_result$star_vals <- sig_star(cor_result$P, cor_result$r)
+    star_vals <- as.data.frame(cor_result[["star_vals"]])
+    return(star_vals)
+}
+
+rcorr_melt <- function(df){
+    cor_result <- rcorr(df, type="pearson")
+    cor_result$star_vals <- sig_star(cor_result$P, cor_result$r)
+    cor_melt <- melt(cor_result$r, id.vars = "row")
+    return(cor_melt)
+}
+
+# Denmark
+DK_rcorr_Pre1985_5sector <- rcorr_func(DK_B9_Pre1985_5sector_og_ts)
+DK_rcorr_Pre1985_3sector <- rcorr_func(DK_B9_Pre1985_3sector_og_ts)
+DK_rcorr_Post1985_5sector <- rcorr_func(DK_B9_Post1985_5sector_og_ts)
+DK_rcorr_Post1985_3sector <- rcorr_func(DK_B9_Post1985_3sector_og_ts)
+DK_rcorr_Long_5sector <- rcorr_func(DK_B9_Long_5sector_og_ts)
+DK_rcorr_Long_3sector <- rcorr_func(DK_B9_Long_3sector_og_ts)
+
+DK_rcorr_Pre1985_5sector_melt <- rcorr_melt(DK_B9_Pre1985_5sector_ts)
+DK_rcorr_Pre1985_3sector_melt <- rcorr_melt(DK_B9_Pre1985_3sector_ts)
+DK_rcorr_Post1985_5sector_melt <- rcorr_melt(DK_B9_Post1985_5sector_ts)
+DK_rcorr_Post1985_3sector_melt <- rcorr_melt(DK_B9_Post1985_3sector_ts)
+DK_rcorr_Long_5sector_melt <- rcorr_melt(DK_B9_Long_5sector_ts)
+DK_rcorr_Long_3sector_melt <- rcorr_melt(DK_B9_Long_3sector_ts)
+
+DK_rcorr_starvals_Pre1985_5sector <- rcorr_starvals(DK_B9_Pre1985_5sector_og_ts)
+DK_rcorr_starvals_Pre1985_3sector <- rcorr_starvals(DK_B9_Pre1985_3sector_og_ts)
+DK_rcorr_starvals_Post1985_5sector <- rcorr_starvals(DK_B9_Post1985_5sector_og_ts)
+DK_rcorr_starvals_Post1985_3sector <- rcorr_starvals(DK_B9_Post1985_3sector_og_ts)
+DK_rcorr_starvals_Long_5sector <- rcorr_starvals(DK_B9_Long_5sector_og_ts)
+DK_rcorr_starvals_Long_3sector <- rcorr_starvals(DK_B9_Long_3sector_og_ts)
+
+# Norway
+NO_rcorr_Pre1985_5sector <- rcorr_func(NO_B9_Pre1985_5sector_og_ts)
+NO_rcorr_Pre1985_3sector <- rcorr_func(NO_B9_Pre1985_3sector_og_ts)
+NO_rcorr_Post1985_5sector <- rcorr_func(NO_B9_Post1985_5sector_og_ts)
+NO_rcorr_Post1985_3sector <- rcorr_func(NO_B9_Post1985_3sector_og_ts)
+NO_rcorr_Long_5sector <- rcorr_func(NO_B9_Long_5sector_og_ts)
+NO_rcorr_Long_3sector <- rcorr_func(NO_B9_Long_3sector_og_ts)
+
+NO_rcorr_Pre1985_5sector_melt <- rcorr_melt(NO_B9_Pre1985_5sector_ts)
+NO_rcorr_Pre1985_3sector_melt <- rcorr_melt(NO_B9_Pre1985_3sector_ts)
+NO_rcorr_Post1985_5sector_melt <- rcorr_melt(NO_B9_Post1985_5sector_ts)
+NO_rcorr_Post1985_3sector_melt <- rcorr_melt(NO_B9_Post1985_3sector_ts)
+NO_rcorr_Long_5sector_melt <- rcorr_melt(NO_B9_Long_5sector_ts)
+NO_rcorr_Long_3sector_melt <- rcorr_melt(NO_B9_Long_3sector_ts)
+
+NO_rcorr_starvals_Pre1985_5sector <- rcorr_starvals(NO_B9_Pre1985_5sector_og_ts)
+NO_rcorr_starvals_Pre1985_3sector <- rcorr_starvals(NO_B9_Pre1985_3sector_og_ts)
+NO_rcorr_starvals_Post1985_5sector <- rcorr_starvals(NO_B9_Post1985_5sector_og_ts)
+NO_rcorr_starvals_Post1985_3sector <- rcorr_starvals(NO_B9_Post1985_3sector_og_ts)
+NO_rcorr_starvals_Long_5sector <- rcorr_starvals(NO_B9_Long_5sector_og_ts)
+NO_rcorr_starvals_Long_3sector <- rcorr_starvals(NO_B9_Long_3sector_og_ts)
+
+# Sweden
+SE_rcorr_Pre1985_5sector <- rcorr_func(SE_B9_Pre1985_5sector_og_ts)
+SE_rcorr_Pre1985_3sector <- rcorr_func(SE_B9_Pre1985_3sector_og_ts)
+SE_rcorr_Post1985_5sector <- rcorr_func(SE_B9_Post1985_5sector_og_ts)
+SE_rcorr_Post1985_3sector <- rcorr_func(SE_B9_Post1985_3sector_og_ts)
+SE_rcorr_Long_5sector <- rcorr_func(SE_B9_Long_5sector_og_ts)
+SE_rcorr_Long_3sector <- rcorr_func(SE_B9_Long_3sector_og_ts)
+
+SE_rcorr_Pre1985_5sector_melt <- rcorr_melt(SE_B9_Pre1985_5sector_ts)
+SE_rcorr_Pre1985_3sector_melt <- rcorr_melt(SE_B9_Pre1985_3sector_ts)
+SE_rcorr_Post1985_5sector_melt <- rcorr_melt(SE_B9_Post1985_5sector_ts)
+SE_rcorr_Post1985_3sector_melt <- rcorr_melt(SE_B9_Post1985_3sector_ts)
+SE_rcorr_Long_5sector_melt <- rcorr_melt(SE_B9_Long_5sector_ts)
+SE_rcorr_Long_3sector_melt <- rcorr_melt(SE_B9_Long_3sector_ts)
+
+SE_rcorr_starvals_Pre1985_5sector <- rcorr_starvals(SE_B9_Pre1985_5sector_og_ts)
+SE_rcorr_starvals_Pre1985_3sector <- rcorr_starvals(SE_B9_Pre1985_3sector_og_ts)
+SE_rcorr_starvals_Post1985_5sector <- rcorr_starvals(SE_B9_Post1985_5sector_og_ts)
+SE_rcorr_starvals_Post1985_3sector <- rcorr_starvals(SE_B9_Post1985_3sector_og_ts)
+SE_rcorr_starvals_Long_5sector <- rcorr_starvals(SE_B9_Long_5sector_og_ts)
+SE_rcorr_starvals_Long_3sector <- rcorr_starvals(SE_B9_Long_3sector_og_ts)
+#############################################################################
+#############################################################################
+##  Create a covariance matrix for each country: pre-1985
+#############################################################################
+#############################################################################
+
+#############################################################################
+##  Denmark
+#############################################################################
+## 5 sector
+#Create a Variance-Covariance matrice for Denmark: 5 Sector
+#
+
+DK_cov_Pre1985_5sector <- cov(DK_B9_Pre1985_5sector_ts)
+# Reshape the variance-covariance matrix to Long form
+DK_cov_Pre1985_5sector_melt <- melt(DK_cov_Pre1985_5sector, id.vars = "row")
+
+## 3 sector
+#Create a Variance-Covariance matrice for Denmark: 3 Sector
+DK_cov_Pre1985_3sector <- cov(DK_B9_Pre1985_3sector_ts)
+# Reshape the variance-covariance matrix to Long form
+DK_cov_Pre1985_3sector_melt <- melt(DK_cov_Pre1985_3sector, id.vars = "row")
+
+#############################################################################
+##  Norway
+#############################################################################
+## 5 sector
+#Create a Variance-Covariance matrice for Denmark: 5 Sector
+NO_cov_Pre1985_5sector <- cov(NO_B9_Pre1985_5sector_ts)
+# Reshape the variance-covariance matrix to Long form
+NO_cov_Pre1985_5sector_melt <- melt(NO_cov_Pre1985_5sector, id.vars = "row")
+
+## 3 sector
+#Create a Variance-Covariance matrice for Denmark: 3 Sector
+NO_cov_Pre1985_3sector <- cov(NO_B9_Pre1985_3sector_ts)
+# Reshape the variance-covariance matrix to Long form
+NO_cov_Pre1985_3sector_melt <- melt(NO_cov_Pre1985_3sector, id.vars = "row")
+
+#############################################################################
+##  Sweden
+#############################################################################
+## 5 sector
+#Create a Variance-Covariance matrice for Denmark: 5 Sector
+SE_cov_Pre1985_5sector <- cov(SE_B9_Pre1985_5sector_ts)
+# Reshape the variance-covariance matrix to Long form
+SE_cov_Pre1985_5sector_melt <- melt(SE_cov_Pre1985_5sector, id.vars = "row")
+
+## 3 sector
+#Create a Variance-Covariance matrice for Denmark: 3 Sector
+SE_cov_Pre1985_3sector <- cov(SE_B9_Pre1985_3sector_ts)
+# Reshape the variance-covariance matrix to Long form
+SE_cov_Pre1985_3sector_melt <- melt(SE_cov_Pre1985_3sector, id.vars = "row")
+
+#############################################################################
+#############################################################################
+##  Create a covariance matrix for each country: 1985 - 2016
+#############################################################################
+#############################################################################
+
+#############################################################################
+##  Denmark
+#############################################################################
+## 5 sector
+#Create a Variance-Covariance matrice for Denmark: 5 Sector
+DK_cov_Post1985_5sector <- cov(DK_B9_Post1985_5sector_ts)
+# Reshape the variance-covariance matrix to Long form
+DK_cov_Post1985_5sector_melt <- melt(DK_cov_Post1985_5sector, id.vars = "row")
+
+## 3 sector
+#Create a Variance-Covariance matrice for Denmark: 3 Sector
+DK_cov_Post1985_3sector <- cov(DK_B9_Post1985_3sector_ts)
+# Reshape the variance-covariance matrix to Long form
+DK_cov_Post1985_3sector_melt <- melt(DK_cov_Post1985_3sector, id.vars = "row")
+
+#############################################################################
+##  Norway
+#############################################################################
+## 5 sector
+#Create a Variance-Covariance matrice for Denmark: 5 Sector
+NO_cov_Post1985_5sector <- cov(NO_B9_Post1985_5sector_ts)
+# Reshape the variance-covariance matrix to Long form
+NO_cov_Post1985_5sector_melt <- melt(NO_cov_Post1985_5sector, id.vars = "row")
+
+## 3 sector
+#Create a Variance-Covariance matrice for Denmark: 3 Sector
+NO_cov_Post1985_3sector <- cov(NO_B9_Post1985_3sector_ts)
+# Reshape the variance-covariance matrix to Long form
+NO_cov_Post1985_3sector_melt <- melt(NO_cov_Post1985_3sector, id.vars = "row")
+
+#############################################################################
+##  Sweden
+#############################################################################
+## 5 sector
+#Create a Variance-Covariance matrice for Denmark: 5 Sector
+SE_cov_Post1985_5sector <- cov(SE_B9_Post1985_5sector_ts)
+# Reshape the variance-covariance matrix to Long form
+SE_cov_Post1985_5sector_melt <- melt(SE_cov_Post1985_5sector, id.vars = "row")
+
+## 3 sector
+#Create a Variance-Covariance matrice for Denmark: 3 Sector
+SE_cov_Post1985_3sector <- cov(SE_B9_Post1985_3sector_ts)
+# Reshape the variance-covariance matrix to Long form
+SE_cov_Post1985_3sector_melt <- melt(SE_cov_Post1985_3sector, id.vars = "row")
+
+#############################################################################
+#############################################################################
+##  Create a covariance matrix for each country: 1950, 1975, 1978 - 2016
+#############################################################################
+#############################################################################
+
+#############################################################################
+##  Denmark
+#############################################################################
+## 5 sector
+#Create a Variance-Covariance matrice for Denmark: 5 Sector
+DK_cov_Long_5sector <- cov(DK_B9_Long_5sector_ts)
+# Reshape the variance-covariance matrix to Long form
+DK_cov_Long_5sector_melt <- melt(DK_cov_Long_5sector, id.vars = "row")
+
+## 3 sector
+#Create a Variance-Covariance matrice for Denmark: 3 Sector
+DK_cov_Long_3sector <- cov(DK_B9_Long_3sector_ts)
+# Reshape the variance-covariance matrix to Long form
+DK_cov_Long_3sector_melt <- melt(DK_cov_Long_3sector, id.vars = "row")
+
+#############################################################################
+##  Norway
+#############################################################################
+## 5 sector
+#Create a Variance-Covariance matrice for Denmark: 5 Sector
+NO_cov_Long_5sector <- cov(NO_B9_Long_5sector_ts)
+# Reshape the variance-covariance matrix to Long form
+NO_cov_Long_5sector_melt <- melt(NO_cov_Long_5sector, id.vars = "row")
+
+## 3 sector
+#Create a Variance-Covariance matrice for Denmark: 3 Sector
+NO_cov_Long_3sector <- cov(NO_B9_Long_3sector_ts)
+# Reshape the variance-covariance matrix to Long form
+NO_cov_Long_3sector_melt <- melt(NO_cov_Long_3sector, id.vars = "row")
+
+#############################################################################
+##  Sweden
+#############################################################################
+
+## 5 sector
+#Create a Variance-Covariance matrice for Denmark: 5 Sector
+SE_cov_Long_5sector <- cov(SE_B9_Long_5sector_ts)
+# Reshape the variance-covariance matrix to Long form
+SE_cov_Long_5sector_melt <- melt(SE_cov_Long_5sector, id.vars = "row")
+
+## 3 sector
+#Create a Variance-Covariance matrice for Denmark: 3 Sector
+SE_cov_Long_3sector <- cov(SE_B9_Long_3sector_ts)
+# Reshape the variance-covariance matrix to Long form
+SE_cov_Long_3sector_melt <- melt(SE_cov_Long_3sector, id.vars = "row")
+
+#############################################################################
+#############################################################################
+#############################################################################
+## Rolling period analysis
+#############################################################################
+#############################################################################
+
+
+DK_start_year <- 1975
+NO_start_year <- 1978
+SE_start_year <- 1950
+years_rolling <- 8
+
+#############################################################################
+## DK
+#############################################################################
+
+DK_rolling_P_G <- data.frame((as.numeric(DK_B9_Long_3sector$Pvt)), (as.numeric(DK_B9_Long_3sector$Govt)))
+DK_rolling_P_R <- data.frame((as.numeric(DK_B9_Long_3sector$Pvt)), (as.numeric(DK_B9_Long_3sector$RoW)))
+DK_rolling_G_R <- data.frame((as.numeric(DK_B9_Long_3sector$Govt)), (as.numeric(DK_B9_Long_3sector$RoW)))
+
+DK_rolling_P_G = matrix(as.numeric(unlist(DK_rolling_P_G)),ncol=2)
+DK_rolling_P_R = matrix(as.numeric(unlist(DK_rolling_P_R)),ncol=2)
+DK_rolling_G_R = matrix(as.numeric(unlist(DK_rolling_G_R)),ncol=2)
+
+DK_rolling_result_P_G <- roll_cor(DK_rolling_P_G, years_rolling)
+DK_rolling_result_P_R <- roll_cor(DK_rolling_P_R, years_rolling)
+DK_rolling_result_G_R <- roll_cor(DK_rolling_G_R, years_rolling)
+
+DK_rolling_plot_P_G <- DK_rolling_result_P_G[2, 1, ]
+DK_rolling_plot_P_R <- DK_rolling_result_P_R[2, 1, ]
+DK_rolling_plot_G_R <- DK_rolling_result_G_R[2, 1, ]
+
+DK_rolling_plot_P_G <- DK_rolling_plot_P_G[!is.na(DK_rolling_plot_P_G)]
+DK_rolling_plot_P_R <- DK_rolling_plot_P_R[!is.na(DK_rolling_plot_P_R)]
+DK_rolling_plot_G_R <- DK_rolling_plot_G_R[!is.na(DK_rolling_plot_G_R)]
+
+DK_rolling_ts <- data.frame(DK_rolling_plot_P_G, DK_rolling_plot_P_R, DK_rolling_plot_G_R)
+DK_rolling_ts <- ts(DK_rolling_ts, start=(DK_start_year+years_rolling), freq=1)
+
+
+#############################################################################
+## NO
+#############################################################################
+
+NO_rolling_P_G <- data.frame((as.numeric(NO_B9_Long_3sector$Pvt)), (as.numeric(NO_B9_Long_3sector$Govt)))
+NO_rolling_P_R <- data.frame((as.numeric(NO_B9_Long_3sector$Pvt)), (as.numeric(NO_B9_Long_3sector$RoW)))
+NO_rolling_G_R <- data.frame((as.numeric(NO_B9_Long_3sector$Govt)), (as.numeric(NO_B9_Long_3sector$RoW)))
+
+NO_rolling_P_G = matrix(as.numeric(unlist(NO_rolling_P_G)),ncol=2)
+NO_rolling_P_R = matrix(as.numeric(unlist(NO_rolling_P_R)),ncol=2)
+NO_rolling_G_R = matrix(as.numeric(unlist(NO_rolling_G_R)),ncol=2)
+
+NO_rolling_result_P_G <- roll_cor(NO_rolling_P_G, years_rolling)
+NO_rolling_result_P_R <- roll_cor(NO_rolling_P_R, years_rolling)
+NO_rolling_result_G_R <- roll_cor(NO_rolling_G_R, years_rolling)
+
+NO_rolling_plot_P_G <- NO_rolling_result_P_G[2, 1, ]
+NO_rolling_plot_P_R <- NO_rolling_result_P_R[2, 1, ]
+NO_rolling_plot_G_R <- NO_rolling_result_G_R[2, 1, ]
+
+NO_rolling_plot_P_G <- NO_rolling_plot_P_G[!is.na(NO_rolling_plot_P_G)]
+NO_rolling_plot_P_R <- NO_rolling_plot_P_R[!is.na(NO_rolling_plot_P_R)]
+NO_rolling_plot_G_R <- NO_rolling_plot_G_R[!is.na(NO_rolling_plot_G_R)]
+
+NO_rolling_ts <- data.frame(NO_rolling_plot_P_G, NO_rolling_plot_P_R, NO_rolling_plot_G_R)
+NO_rolling_ts <- ts(NO_rolling_ts, start=(NO_start_year+years_rolling), freq=1)
+
+
+#############################################################################
+## SE
+#############################################################################
+
+SE_rolling_P_G <- data.frame((as.numeric(SE_B9_Long_3sector$Pvt)), (as.numeric(SE_B9_Long_3sector$Govt)))
+SE_rolling_P_R <- data.frame((as.numeric(SE_B9_Long_3sector$Pvt)), (as.numeric(SE_B9_Long_3sector$RoW)))
+SE_rolling_G_R <- data.frame((as.numeric(SE_B9_Long_3sector$Govt)), (as.numeric(SE_B9_Long_3sector$RoW)))
+
+SE_rolling_P_G = matrix(as.numeric(unlist(SE_rolling_P_G)),ncol=2)
+SE_rolling_P_R = matrix(as.numeric(unlist(SE_rolling_P_R)),ncol=2)
+SE_rolling_G_R = matrix(as.numeric(unlist(SE_rolling_G_R)),ncol=2)
+
+SE_rolling_result_P_G <- roll_cor(SE_rolling_P_G, (years_rolling))
+SE_rolling_result_P_R <- roll_cor(SE_rolling_P_R, (years_rolling))
+SE_rolling_result_G_R <- roll_cor(SE_rolling_G_R, (years_rolling))
+
+SE_rolling_plot_P_G <- SE_rolling_result_P_G[2, 1, ]
+SE_rolling_plot_P_R <- SE_rolling_result_P_R[2, 1, ]
+SE_rolling_plot_G_R <- SE_rolling_result_G_R[2, 1, ]
+
+SE_rolling_plot_P_G <- SE_rolling_plot_P_G[!is.na(SE_rolling_plot_P_G)]
+SE_rolling_plot_P_R <- SE_rolling_plot_P_R[!is.na(SE_rolling_plot_P_R)]
+SE_rolling_plot_G_R <- SE_rolling_plot_G_R[!is.na(SE_rolling_plot_G_R)]
+
+SE_rolling_ts <- data.frame(SE_rolling_plot_P_G, SE_rolling_plot_P_R, SE_rolling_plot_G_R)
+SE_rolling_ts <- ts(SE_rolling_ts, start=(SE_start_year+years_rolling), freq=1)
+
+
+# Save the default plot settings
+
+```
+
+
+Introduction
+============
+
+[as some examples, @trehan1991; @blanchard2002; @bernanke2005; @blanchard2007; @vansteenkiste2008]
+@aliabbas2011
+@christensenetal1995
+
+Why is investigating sectoral balances important from a historical point
+of view?
+
+The interaction between broader institutional sectors of the economy has
+captured the intrigue of economists and policy makers at least since
+François Quesnay published the two sector circular flow model in
+*Tableau èconomique* in 1758. The development in the System of National
+Account, where non-financial flows, financial flows and balance sheets
+accounts at a sector level are a part of the National Account, has given
+an empirical foundation for analyzing the interaction across the
+different sectors of the economy. In the spirit of Keynes, Minsky,
+Godley and others the idea sectoral balance has been used to understand
+the financial status of the different sectors of the economy. All
+sectors cannot be net saver at the same time, since the sum of the net
+lending across the sectors must be 0; when one sector is in sectoral
+surplus at least one other sector must be in sectoral deficit.
+Furthermore, if a sector is net borrower over a longer period of time,
+the accumulation of financial liabilities exceeds the accumulation of
+financial assets indicating a process of leveraging. This leveraging in
+one sector must have a counterpart in at least one other sector, where
+the accumulation of financial assets exceeds the accumulation of
+financial liabilities.
+
+Krugman (2009) uses the sectoral balances to explain what happened in
+the American economy from a historical point of view. He specifically
+draws a major difference between the Great Recession and the Great
+Depression looking at the sectoral balances. He argues that the
+government deficit, due to automatic stabilizers rather than
+expansionary fiscal policy, saved the American economy from a second
+Great Depression. During the Great Depression, the size of the
+Government sector in US was quite small, so it couldn't increase its
+expenditures enough to keep GDP at the same level. As a result of this,
+the GDP fell in order to keep the private surplus around zero, which
+created an economic recession. The use of sectoral balances is not only
+able to explain what has happened, but has also been use as a tool to
+discuss the sustainability of the development of specific sectors. In
+his 1999 analysis, Godley identified 7 unsustainable processes in the
+American economy and in the period from 1999 to 2006 he warned against a
+forthcoming crisis several times. He argued, that as soon as the deficit
+(and exploding debt) in the private sector abated, the American economy
+would go into a recession -- unless the public sector(and the
+interaction with the rest of the world) changed its behavior
+dramatically.
+
+Looking at the sectoral balances therefore both offers the opportunity
+of analyzing an economy from a historical point of view or to discuss
+the sustainability of a given process. Focusing on the historical point
+of view, the Scandinavian countries are good cases, since they have a
+long history of reporting reliable national account data. Amongst the
+Scandinavian countries the forerunners were Denmark and Norway in the
+late nineteenth century with Sweden following shortly behind in the
+first decade of the twentieth century. These estimations were initially
+based on tax statistics, and followed a commodity flow method. Interest
+persisted in Denmark, driven partially by income tax evasion controversy
+and partly by competition between the manufacturing and agricultural
+sectors as to which was more important for the future development of
+Denmark. Sweden, however, was the first to begin the annual systemized
+production of national accounts statistics. Lately data on the sectoral
+balances as well has been released, going back to 1950s for Sweden and
+1970s for Denmark and Norway. This data creates the possibility of
+analyzing the development in the three economies from a sectoral balance
+approach with the purpose of discussing major changes in these
+economies.
+
+Our paper makes three important contributions. Firstly, we add to the
+growing, but limited body of recent literature to focus on financial
+sector balance (FSB) approach as a tool for analysis. Secondly, using
+data beginning in the 1970s (1950s for Sweden), we are able to perform
+our analysis over a long time-frame. Thirdly, Our paper is, to the best
+knowledge of the authors, the first attemp to analyze the Scandinavian
+countries from a sectoral balances approach.
+
+In section 2, we provide a concise description of the Financial Sectoral
+Balances (FSB) approach and an overview over major contributions to the
+current national account system for the three countries. Aside from this
+description, the empirical evidence for the three countries is presented
+in section 2.1. In we discuss relevant literature, and in we discuss the
+data, methods and results of our empirical analysis. This is followed by
+a brief discussion in and we conclude in.
+
+Sectoral Balances approach
+==========================
+
+Terminology -- interpretation
+
+This section begins with a brief introduction to the Scandinavian
+National Account from a historical point of view. After this historical
+presentation the principle of the sectoral balances is derived from
+national account identities, before the empirical evidence for both the
+sectoral balances and the financial net wealth is presented in the last
+subsection.
+
+A rather common view is that academics and other economic analysts do
+not fully comprehend the whole potential of the System of National
+Accounts (SNA). The SNA is often not seen as the prevailing tool for
+economic analysis. Reasons are among others that the System is
+considered to be targeted mainly to administrative uses such as for
+fiscal policy and international comparisons and that the architecture of
+the System is more or less cut in stone. (Bergman 2015)
+
+Background
+----------
+
+In Christensen et. al. (1995) a survey on the Nordic National Account
+since the 1880s is carried out. In that paper they date the first
+attempts to calculate the national income back to the end of the 19^th^
+century for Denmark and Norway and the beginning of the 20^th^ century
+for Sweden. Although the main focus of the paper is on the development
+of the national account from the real side of the economy, the authors
+do mention however, that already in the 1930s Frisch emphasizes the
+importance in the distinction between real(goods and services) and
+financial objects(claims and counterclaims), Christensen et. al. (1995,
+35). Despite this point from Frisch, the financial side of the accounts
+didn't play a major role in the national account. The lack of
+information on the financial side of the economy, was not only a concern
+for Frisch, but also Copeland in the U.S. and Denitez in France:
+
+>"When total purchases of our national product increase, where does the
+money come from to finance them? When purchases of our national
+product decline, what becomes of the money that is not spent?" 
+(Copeland, 1949, 254).
+
+This demand for information led to the development of the *flow of
+funds* accounts, which is now an integrated part of the system of
+national account. With the 1968-SNA standardization the financial
+balance sheet was added to the national account system, but not before
+SNA 93 guidelines for a fully specified system of financial accounts,
+including revaluation account, were given. (Abildgaard 2008)
+
+In 1990 the Norwegian national account system was updated with the
+purpose of fulfilling the recommendations in the SNA 1993 and the
+European standard in ESA 1995. Regarding the sectoral balances two
+important aspects were now taking into account: Firstly, the
+institutional sectoral account was establish, which separated the
+economy into five sectors(non-financial corporations, financial
+corporations, public sector, households and Rest of the World).
+Secondly, the financial part of the national account was improved
+significantly(Statistics Norway 2012). According to Statistic Norway
+2012, during the period of 1950s to 1990, the financial part of the
+national account hasn't been developed as much as the real side of the
+national account. However, in Statistics Norway's publications 'Credit
+Market Statistics: Financial Sector Balance Sheet'(see e.g. Statistics
+Norway 1980) the stock of a number of financial assets can be seen at a
+sector-level decades earlier, but without the financial account being a
+part of this statistic. Also in Denmark, the financial balance sheets
+wasn't a part of the national account before statistic Denmark decided
+to follow the SNA 1993 and ESA 1995. According to Abildgaard (2008),
+Statistic Denmark didn't integrate financial account stock- and
+flow-data in the annual national accounts statistics before 2001. The
+financial sectoral data provided since 2001 covers the period since
+primo 1995. Regarding the non-financial sectoral national account, no
+existing version of Danish historical national-account provide sectoral
+accounts before 1971. The two dataset can be connected using the net
+lending from the non-financial side as financial net lending on the
+financial side of the economy[^4].
+
+In Bergman et. al (2010) the sectoral balances for the Swedish economy
+is discussed. The authors point out, that balance sheets didn't attract
+much attention and that didn't play a role in economic analysis. The
+lack of balance sheet in the national account was according to statistic
+Sweden due to lack of data and theoretical disagreements. Like Norway,
+Sweden also following the recommendations and standards in SNA 1993 and
+1995.
+
+In Sweden the Swedish National Wealth Database shows national wealth and
+sectoral net lending back to 1810, Waldenström (2017). From 1880 to 1901
+both Bollfras and Fahlbeck (Waldenström -- appendix) gave some estimates
+on the stock of wealth(and debt) in Sweden for the private sector and
+public sector in total. Their work did therefore not decompose the
+private and public sector. In the 1950s and 1970s more attempts were
+made to estimate the balance sheet of the household sector, but without
+much attention of the other sectors of the economy. In 1993 Werin
+created a financial balance sheet for all the sectors from 1945-1990.
+Following the recommendation in the development of SNA and ESA,
+Statistics Sweden offers both national and financial account for all
+institutional sectors in the economy.
+
+Accounting
+----------
+
+In this section the concepts of net lending (*NL*) is introduced.
+
+To understand the properties of *NL* we start with the composition of
+GDP:
+
+$$GDP = C + \ I_{P} + \ I_{G} + G + X - M$$
+
+Where $C$ is *Pvt* consumption, $I_{p}$ is *Pvt* investment, $I_{g}$ is
+*Govt* investment, $G$ is *Govt* consumption, $X$ is exports and $M$ is
+imports. By introducing transfer payments across sectors and including
+public investment in public consumption, $G$, the three sector balance
+can be derived as,
+
+$$\left( S_{P} - I_{P} \right) + \left( NT - G \right) + (M - X - NIA) = 0$$
+
+Where $S_{p}$ is *Pvt* savings, $\text{NT}$ is tax payments received by
+*Govt*, net of transfer payments and subsidies paid by *Govt* and
+$\text{NIA}$ is the net income and current transfers received from
+abroad. The first bracket expresses the sector balance for *Pvt*, the
+second bracket expresses the sector balance for *Govt*, and the third
+bracket represents the sector balance for *RoW*[^5]. Broadly speaking,
+changes in the *NL* position are driven by changes in either the incomes
+or the expenditures of the sector in question, together with changes in
+sector investment behavior.
+
+From equation ID.2, an important property for the sum of the *NL* across
+the three sectors can be seen, in that,
+
+$$\sum_{}^{}\text{NL} = 0$$
+
+This property opens up for a very interesting statistical property,
+which is used in the analysis.
+
+In the equations above the net lending is derived from the real side of
+the economy as basically the difference between income and expenditures.
+As putted forward by Wolfgang Stützel, the aggregated savings of an
+economy is equal to the aggregated investment, so the sum of net lending
+of the total economy should therefore be 0. In case of a mismatch
+between the income and the expenditure interaction with the financial
+side of the economy is needed. If the expenditure e.g. exceeds the
+income, the deficit needs to be financed by accumulation of financial
+liabilities. When the income exceeds the income however, the surplus is
+placed in financial assets. For a sector as a whole, simultaneously
+accumulations of assets and liabilities take place, but the
+interrelationship between them depends on the net lending. The net
+lending should therefore be the same, whether you looked at it as a
+'real' saving surplus or financial saving surplus.
+
+The accumulation of both financial assets and liabilities and
+non-financial assets, affects the stock of wealth in all sectors. No
+matter whether one looks at net lending from the non-financial flows or
+the financial flows, a positive net lending increases, ceteris paribus,
+the stock of wealth for the individual sector, which can be written
+as,(LOOK AT THE PAPER ABOUT STÜTZEL:
+
+$$V = V_{t - 1} + NL + CG$$
+
+where *V* is the net wealth, *NL* is net lending, and *CG* is any
+capital gains(or revaluations). As pointed out by Waldenström (2016) and
+Knudsen (2017) fluctuations in net wealth over time are mainly due to
+changes in net lending(net accumulation of financial assets) rather than
+capital gains, whereas short term fluctuations can be due to capital
+gains. Since the description of the three countries is based on the long
+term story, capital gains are ignored in this description.
+
+Literature Review
+-----------------
+
+Literature review on how sectoral balances are dealt with
+
+Theoretical aspects
+-------------------
+
+The sectoral financial balances analysis (*SFB*), as a tool for
+analysis, has received some attention in recent years, and is based on
+the system of national accounts (SNA). The origin of standardized system
+of national accounts employed today can be traced back to James Meade
+and Richard Stone in the UK, and to Morris A. Copeland in the USA, who
+contributed greatly to the establishment of the 1953 United Nations
+System of National Accounts. xxx trace the development of the SNA back
+to an article published by Meade and Stone at the Great Britain Treasury
+-- although the inspiration can also attributed further back to Keynes
+and many others such as François Quesnay. As noted by xxx, the initial
+interest of Copeland in the 1940s was to investigate the financing
+requirements of economic activity between and across the national
+sectors[^6]. The SFB approach could be described as a continuation of
+Copeland's goals with the aid of modern technology. The work of Wynne
+Godley together with other key authors is recognized by many economist
+as the instigating factor in the re-emergence of *SFB*. In light of the
+relatively recent availability of comprehensive and relatively accurate
+data on the financial side of the economy, Godley, together with several
+collaborators, conducted truly pioneering work in integrating the real
+and financial sides of the economy in a unified macroeconomic modelling
+framework.
+
+From a theoretically point of view, the interaction between the balances
+of the sectors is usually explained by either The Ricardian Equivalence
+Hypothesis (or rational expectations) (REH) or the Twin Deficit
+Hypothesis (TDH).
+
+The REH theory, introduced by xxx and more recently reviewed by xxx,
+explains that as *Govt* borrows, households (*Hh*), and *Pvt* in
+general, expect that *Govt* will need to repay its debt in the future.
+The key assumption in this case it is that *Pvt* is able to anticipate
+and interpret the impact of the net borrowing of *Govt* on their current
+and future consumption possibilities, and respond in a rational manner
+by 'smoothing' inter-temporal consumption patterns. The response is
+therefore to save in times when *Govt* increases spends.
+
+The Twin Deficits Hypothesis has been investigated extensively xxx, and
+in particular with respect to the US economy . According to this
+hypothesis a clear link between current account deficits and negative
+*NL* in *Govt* should be identified. The key mechanism is connected to a
+tacit assumption of fully employed domestic resources. Therefore,
+stimulation of domestic demand by *Govt* spending will translate
+directly into a decline in the current account balance since the extra
+income in *Pvt* will boost consumption and thereby result in a decline
+in domestic savings --- thus driving a simultaneous 'twin deficit' in
+*Govt*, and the current account. The crux of which is that not only will
+additional *Govt* spending fail to improve the foreign balance, but will
+in fact deteriorate it further.
+
+Empirical Results
+-----------------
+
+Despite the fact that the sector balances are often discussed,
+surprisingly few empirical analyses can be found in the literature. In a
+recent paper, Glötz xxx, present an analysis that follows the work
+presented in xxx, where the test the REH and TDH against some empirical
+evidence. In xxx the analysis is carried out for 22 European countries
+using quarterly data from 1999 to 2013. They show, how *NL* of the
+single sectors behaves with regards business cycles; their results are
+inconclusive and generally it depends on the chosen country. In their
+analysis *NL* of households and financial corporations in Denmark lead
+the business cycle, while *NL* of non-financial corporations and *RoW*
+react as a response to the business cycle. *Govt* shows no evidence of
+either lag or lead.
+
+In Sweden on the other hand, *NL* of *Govt* (and non-financial
+corporations) reacts to the business cycle, while *NL* of households
+leads the business cycle. In both Denmark and Sweden, net borrowing of
+households and non-financial corporations is pro-cyclical, while net
+borrowing in *Govt* is counter-cyclical. For Denmark *NL* of *RoW* is
+counter-cyclical and *NL* of financial corporations is pro-cyclical,
+neither of which show significant patterns for Sweden. In , the REH and
+TDH are rejected, fully in line with the conclusion in xxx.
+
+In xxx a graphical presentation of *NL* of the five institutional
+sectors for both the US (for 1947-2004), and a panel of developing
+countries (for 1980-2002), is used to criticize the TDH and REH. The
+contradictory expectations are confirmed in a statistical analysis,
+where they use a variance-covariance analysis of *NL* and capacity
+utilization to reject the two hypotheses.
+
+xxx categorized the two theories as emerging from *Intra-temporal
+trade*, and *Inter-temporal responses* effects. The former describes the
+impact of fiscal policy on domestic demand, and thus relative purchasing
+power (or the real exchange rate) (TDH), and the latter describes
+Ricardian type inter-temporal adjustment by *Pvt* (REH). Their
+presentation allows for a more nuanced understanding of the
+effectiveness of different policies given prevailing conditions in trade
+and financial openness, and monetary/exchange rate regimes. The point of
+departure for their analysis is that They noted that such studies can be
+divided into three groups, the first, causality tests and VARs. Second,
+, and the third as a combination of narrative and regression analysis to
+examine the effects on the foreign balance. They drew a similar
+conclusion from a mixed method analysis, including a series of panel
+regressions, an analysis of large changes in fiscal and current account
+balances, and a quarterly structural VAR.
+
+These contributions are more focused on either the validity of TDH or
+REH in a group of countries or to explain the effect of i.e. fiscal
+policy in general. None of these papers try to provide information of
+specific event using the sectoral balances approach. In Van Treeck et.
+al., an empirical analysis of the three sector balance is used to
+discuss the possible outcomes of the Stability Pact program from
+2011-2014, where the authors seriously question the reliability of
+predicted results from the European Commission. Given the predictions of
+the growth rates in each economy and the assumption for the financial
+balance for *Govt* and *RoW*, they simulate and evaluate the implicitly
+assumed prediction for *Pvt*. In Brink(1983) he argues that the major
+reason for the negative *Govt* *NL* in Denmark during the 1970s and
+1980s was due to low demand from abroad as a result of the global
+economic downturn and financial consolidation in *Pvt*, where the
+savings exceeded the investments. As stated by Krugman (2009), the
+government deficit, is due to automatic stabilizers rather than
+expansionary fiscal policy. It doesn't imply however, that discretionary
+policy doesn't affect the balance, since these policies directly has an
+effect on the balances in the private sector as well as the Rest of the
+World. In case of a lower propensity to import in the *Govt* compared to
+the private sector, an increase in the public consumption financed by an
+increase in taxes leads to an increase in *NL* in *Pvt*, while the *NL*
+in RoW falls(improvements of the current account). (Brink 1983).
+
+BIS (2016) uses the banking crisis in Sweden in the early 1990s as a
+case for the relevance of sectoral balance approach. As a result of the
+crisis, the private sector wanted to deleverage, which can be seen by
+the steep increase in net lending in the private sector in Sweden
+following the crisis (in figure 2). As a result of this deleveraging in
+the private sector, also the public sector was massively affected. The
+lack of demand from the private sector led to a deterioration of the
+public balance. After the initial phase the need for deleveraging in the
+private sector faded out, which resulted in a deterioration of the
+public balance the public sector in Sweden managed to improve the
+balance again. In a working paper from Statistics Sweden, Bergman et.
+al.(2010) analyses the changes in balance sheets across the different
+sectors of the economy during 2008-2009 following the financial and
+economic crisis. Discussing the foreign debt, they link the changes in
+balance sheet across time with the net lending of rest of the world.
+Despite continuously negative *NL* for RoW, the Swedish debt to rest of
+the World hasn't fallen to the same degree. They explain this
+discrepancy with capital gains(revaluation of the Swedish stock of
+liabilities held abroad), as seen in equation 3 in this paper.
+
+The Three Economies
+===================
+
+Figure 1 shows *NL* as well as NFW for the three main sectors for
+Denmark.
+
+```{r BF90DK, fig.cap="DK: Net Financial Wealth", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
+par(mfrow=c(1, 1))
+par(mar=c(4,4,2,2))
+
+plot.ts(DK_eurostat_BF90_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
+        col=c("#107831", "#443eff", "#ffc100"), 
+        ylab = "Per cent GDP")
+abline(h=0, col="#000000")
+legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
+       lwd=3,lty=c(3:1), legend=colnames(DK_eurostat_BF90_3sector_ts),bty='n')
+grid()
+```
+
+```{r B9DK, fig.cap="DK: Net Lending", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
+par(mfrow=c(1, 1))
+par(mar=c(4,4,2,2))
+
+plot.ts(DK_B9_Long_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
+        col=c("#107831", "#443eff", "#ffc100"), 
+        ylab = "Per cent GDP")
+    abline(h=0, col="#000000")
+    legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
+           lwd=3,lty=c(3:1), legend=colnames(DK_B9_Long_3sector_ts),bty='n')
+    grid()
+
+```
+Figure 1: Net lending and financial net wealth, Denmark.
+
+As shown above, *NL* for *Govt* was negative from 1972 to the late
+1990s, with the exception of a few years of positive *NL* in the late
+1980s. In the years leading up to the Great Recession, *Govt* shows
+positive *NL* of up to $5\%$ of GDP, clearly breaking from all former
+patterns of *NL* for *Govt*. In the period from 1997-2014 Denmark
+produced more oil and gas than consumed, which resulted in a positive
+net export of oil and gas. Since this production is taxable it created a
+large income for *Govt*. After the crisis, *NL* turned negative again,
+which resulted in a warning from the European commission in 2010. A part
+of this negative *NL* can be explained by lack of revenue from the
+energy trade, and settled at a net balanced level in 2014.
+
+*NL* of *Pvt* has fluctuated more dramatically from a historical point
+of view, with negative *NL* until 1980 and again in the second half of
+the 1980s. Despite the negative *NL* in the second half of the 1980s,
+savings of *Pvt* actually rose in that period as a result of a tax
+reform, and credit policy reforms that came to be called the 'potato
+diet' . Since 1990 however, *NL* of *Pvt* in Denmark has been almost
+entirely positive. The only exception being the years shortly prior to
+the Great Recession, where the level of investment exceeded the level of
+savings. A major contribution to this positive *NL* can be found in the
+expansion of the labour market pensions scheme as a part of a collective
+bargaining agreement in 1991 . According to empirical results from
+DØRS?, DKK 1 of pension contributions increases the overall savings for
+*Pvt* by between DKK 0.80 and DKK 0.85. Thus, even though the pension
+contribution crowds out other savings, the overall effect on sector
+savings is positive. In the aftermath of the crisis, *NL* of *Pvt*
+remained positive in every year (at around $10\%$ of GDP). This
+development is both the result of a drop in investment by households
+(HH) and non-financial corporations (NFC) and of an increase in savings
+by HH, financial corporations (FC) and NFC.
+
+*NL* of *RoW* can be divided into two sub periods of time; before 1989
+and after 1989. Before 1989 the Danish economy faced a current account
+deficit. Starting from the 1960s Denmark experienced a prolonged period
+of more than 25 years of current account deficit, which resulted in the
+accumulation of foreign denominated *Govt* debt, and an associated net
+foreign liability position to *RoW*. Aside from the high public debt,
+this period was characterized by borrowing of *Pvt* and high inflation,
+which deteriorates the current account (XXX?). In order to boost Danish
+exports, the Danish krone was devalued several times between 1978 and
+1982. Disinflationary policies were also used to increase international
+competitiveness and tax policy was used to enforce a balanced budget for
+*Govt*.
+
+In 1982 the Krone was pegged to the Deutsche Mark and from 1999 to the
+euro. The stability following the fixed exchange rate regime, combined
+with low domestic demand boosted the Danish trade balance, which went
+into surplus in the middle of the 1980s. From the middle of the 1980s
+the savings of *Pvt*, as mentioned above, increased as a result of
+credit and tax reforms. Because of the accumulated foreign debt, and the
+associated interest burden, it was not until 1990 that the current
+account moved into positive territory. After 1990, the situation changed
+significantly, and *NL* of *RoW* has since remained negative for all
+years, except for 1999. This change was, until 2005, mainly due to
+improvements on the trade balance, while the current account surpluses
+from 2005-2015 were primarily driven by improvements in the net export
+of services and net transfers from abroad (income from both direct and
+financial investment, and wages) .
+
+Figure \ref{fig:B9BF90DK}b shows NFW of the
+individual sectors. The introduction of capital gains is beyond the
+scope of this paper, and is the reason for the misalignment between the
+cumulative result in Figure \ref{fig:B9BF90DK}a and
+*NL* in Figure \ref{fig:B9BF90DK}b. The effect of
+accumulated liabilities can be seen for Denmark in terms of foreign
+denominated *Govt* debt leading up to the 1990s. The persistent foreign
+deficit, and the debt related to it, were huge problems for the Danish
+economy, as discussed by (BRINK?).
+
+According to (XXX?), in the 1950s and 1960s Denmark and Sweden They
+noted that the three decades to follow remained export led, but changed
+dramatically from relatively protected to two of the most open and
+internationally integrated countries in Europe, with the political
+economic model dubbed . The initial post-war stage they described as
+state-protected and supported domestic market development. From a policy
+perspective, both countries followed policies with Keynesian roots, but
+following the OPEC oil crises of the early 1970s, both suffered from
+expanding *Govt* deficits, inflation and upward wage pressures.
+
+In Denmark the net financial wealth (NFW) of *Govt* was -40% of GDP in
+1995. Between 1995 to 2005 the the net financial deficit was reduced to
+a close to neutral position, and remained fairly stable since. The NFW
+of *RoW* in Denmark declined continuously throughout the period, from
+$30\%$ of GDP to $- 50\%$ of GDP. Finally, the NFW of *Pvt* illustrates
+what appear to be two entirely different regimes; the first as a stead
+decline, between 1995 and 2007, where total NFW was negative between
+2007 and 2009[^7]. The second appears as a rapid accumulation following
+2009, where the sector as a whole increased its financial NFW to $60\%$
+of GDP --- a dramatic consolidation of the sector[^8]
+
+Figure 2 shows *NL* as well as NFW for the three main sectors for
+Sweden. *NL* is normalized by the $\text{GDP}$
+
+```{r BF90SE, fig.cap="SE: Net Financial Wealth", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
+par(mfrow=c(1, 1))
+par(mar=c(4,4,2,2))
+
+plot.ts(SE_eurostat_BF90_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
+        col=c("#107831", "#443eff", "#ffc100"), 
+        ylab = "Per cent GDP")
+abline(h=0, col="#000000")
+legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
+       lwd=3,lty=c(3:1), legend=colnames(SE_eurostat_BF90_3sector_ts),bty='n')
+grid()
+```
+
+```{r B9SE, fig.cap="SE: Net Lending", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
+par(mfrow=c(1, 1))
+par(mar=c(4,4,2,2))
+
+plot.ts(SE_B9_Long_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
+        col=c("#107831", "#443eff", "#ffc100"), 
+        ylab = "Per cent GDP")
+    abline(h=0, col="#000000")
+    legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
+           lwd=3,lty=c(3:1), legend=colnames(SE_B9_Long_3sector_ts),bty='n')
+    grid()
+
+```
+Figure 2 Net lending and financial net wealth, Sweden
+
+Historically, *NL* for the Swedish economy fluctuated around $0\%$ of
+GDP for all three sectors from 1950 to the middle of the 1970s. For both
+*Pvt* and *Govt* the fluctuations increased until the first half of the
+1990s, where a glut in *Pvt* credit was followed by a banking crisis,
+and, as noted by , *Govt* was forced into a bailout. Investment in *Pvt*
+decreased, which manifested in *Pvt* annual *NL* of $10\%$ and *Govt*
+*NL* of $- 10\%$ of GDP between 1992 and 1994.
+
+Since the 1990s both savings and investment of *Pvt* increased strongly
+and seem to co-move. While *NL* of *Pvt* took a small dip in the middle
+of the 1990s, *NL* remained positive at around $5\%$ of GDP. Prior to
+the Great Recession the *NL* was still closer to zero as a result of a
+pro-cyclical investment behaviour of *Pvt*. At the same time however,
+savings increased as a result of large increases in income relative to
+the consumption. The crisis is difficult to identify looking at *NL* for
+*Pvt* where a reduction in income resulted in a small reduction in
+savings. Since investment had a stronger reaction to the fall in the
+overall economic activity, *NL* stayed at almost the same level as the
+year before. Since the crisis, the *NL* of *Pvt* has been positive,
+largely due to higher levels of savings compared to investment.
+
+After the imbalance connected to the banking crisis in the beginning of
+the 1990s, *NL* of *Govt* returned closer to zero, but with two periods
+of surplus budget positions in the early 2000 and 2007-2008. Investment
+of *Govt* seems to be unaffected by business cycles, thus most changes
+in *NL* can be identified by changes in savings. Savings of *Govt* is
+often pro-cyclical, since income increases with the business cycle,
+while expenditures are by-and-large counter-cyclical. Periods of strong
+increases in the economic activity at the end of the 1990s and prior to
+the Great Recession are therefore associated with positive *NL* in
+*Govt*, and after the crisis the levels of savings and investment once
+again converged. Reflecting balanced government budget politics.
+
+*NL* of *RoW* fluctuated between 5% and -5% in the period of 1975 to the
+end of the 1990s. explained that by the mid 1980s Sweden had experienced
+prolonged inflation that was higher than most other countries. This,
+together with fixed exchange rate arrangements, resulted in steady real
+exchange rate appreciation and declining competitiveness of Swedish
+firms[^9]. This jeopardised export based economic growth policies and
+thus was accompanied by occasional deliberate devaluations of the
+Swedish Krona --- six after 1973. Since 2000 *NL* of *RoW* has
+maintained a negative annual balance of more than $5\%$ of GDP.
+
+For Sweden the NFW position of *Pvt* is negative, but unlike Denmark,
+the position remains negative, in contrast to what might be expected
+from the positive *NL* balance of the sector over the entire period of
+1995 to 2016[^10]. The trend in the net asset position of *RoW*,
+however, follows the *NL* position, which is negative throughout the
+period. *Govt* *NL* in marginally positive, and its NFW position
+improves throughout, initially negative, and gradually moving to
+positive $20\%$ of GDP.
+
+Interestingly, xxxx noted that using a flat rate tax deduction (though
+omitting progressive tax rates) on interest payments, the Swedish
+household sector had negative costs of borrowing from before 1960 until
+1990. and both noted extensive deregulation of both the Danish and
+Swedish financial markets between 1980 and 1990, the last of which for
+Sweden included deregulation of international capital flows and the
+establishment of a new money market with options and derivatives. These
+deregulations permitted Swedish households to take advantage of the low
+interest rate environment. explained that 1992 saw massive credit losses
+in the Swedish *Pvt*, associated with the deregulations that preceded.
+This was combined with an international economic slowdown, a European
+currency crisis, and a *Govt* financial crisis -- followed by a
+reconstruction of the tax system. All of which led to the abandonment of
+the official fixed exchange rate system, a massive depreciation of the
+Swedish Krona and the start of the worst crisis in Sweden since the
+1930s. Unemployment rose from 1.5% to 8.2%, together with a substantial
+decline in per capita GDP (adjusted for international purchasing power).
+
+In Figure 3, *NL* as well as NFW for the three main sectors for Norway
+can be seen. *NL* is once again normalized by $\text{GDP}$, and it is
+worth noting the huge scale of Norwegain NFW, when compared with Denmark
+and Sweden.
+
+
+```{r BF90NO, fig.cap="NO: Net Financial Wealth", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
+par(mfrow=c(1, 1))
+par(mar=c(4,4,2,2))
+
+plot.ts(NO_eurostat_BF90_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
+        col=c("#107831", "#443eff", "#ffc100"), 
+        ylab = "Per cent GDP")
+abline(h=0, col="#000000")
+legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
+       lwd=3,lty=c(3:1), legend=colnames(NO_eurostat_BF90_3sector_ts),bty='n')
+grid()
+```
+
+```{r B9NO, fig.cap="NO: Net Lending", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
+par(mfrow=c(1, 1))
+par(mar=c(4,4,2,2))
+
+plot.ts(NO_B9_Long_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
+        col=c("#107831", "#443eff", "#ffc100"), 
+        ylab = "Per cent GDP")
+    abline(h=0, col="#000000")
+    legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
+           lwd=3,lty=c(3:1), legend=colnames(NO_B9_Long_3sector_ts),bty='n')
+    grid()
+
+```
+
+Figure 3 Net Lending and Financial net Wealth, Norway
+
+*NL* for the sectors of the Norwegian economy is markedly different from
+the Danish and Swedish cases. In contrast to Sweden and Denmark, *NL* of
+*Govt* does not fluctuate around zero, and has been significantly
+positive since 1993. With a large current account surplus and a
+(relatively) small positive or negative level of *NL* of *Pvt*, *Govt*
+thus necessarily has a large positive annual *NL* balance. Since 2010,
+both *RoW* and *Govt* *NL* have trended closer to balanced positions,
+but remain negative and positive on an annual basis respectively.
+
+For Norway, the persistent current account surplus has emerged in the
+form of a large *Govt* owned, foreign denominated asset, the Government
+Pension Fund Global[^11]. Up through the 1970s and 1980s the current
+account fluctuated between -5% and 5%, before it in 1989 for the last
+time was negative. The export of oil and gas can be seen as a important
+aspect of this transition, which can be demonstrated by looking at the
+history of the Norwegian oil production. In 1974 the export and oil and
+gas amounted to 2.4% of the total export of goods; 10 years later, in
+1984, the share was increased to more than 50%, which was still the case
+in 2013 . In the latter half of the 1980s the combination of low
+domestic demand (lower import) and high demand abroad (not only for
+petroleum, but also for Norwegian goods and services) gave rise to a
+surplus on the current account. In 1990, the government oil fund was
+founded, and as noted by , changed the state of the Norwegian economy.
+The large volatility in oil prices was during the 1980s appears to have
+had a strong influence on the Norwegian economy; high oil prices
+generated huge positive net exports, while low prices had the opposite
+effect. The low oil price since 2014 has also clearly had a negative
+effect on revenues and the surplus on the current account has declined
+notably.
+
+As explained, by investing the surplus from the oil production abroad,
+the rate of return was independent of the Norwegian economy and the
+interest and property income of the fund could be used to stabilize the
+economy in times with low economic activity. The decision to invest the
+surplus, rather than stimulating the economy immediately, was also to
+avoid overheating the economy and to preserve the oil revenues for
+future generations. Oil revenues take several forms for the Norwegian
+*Govt*, including oil taxes, licenses for exploration, dividends from
+the co-ownership of Statoil and interest from foreign investments.
+Another important change in the structure of the Norwegian economy was
+the choice of exchange rate regime. According to , in 1978 Norway
+decided to leave the *currency snake* and link the Norwegian Krone to a
+trade-weighted basket of currencies . In the first half of the 1980s,
+much the same as for Denmark and Sweden, several devaluations were
+enacted due to reduced competitiveness of Norwegian firms. In 1986 the
+Krone was devalued again as a result of sharp reversal from a current
+account surplus to a deficit. This was caused in part by lower oil
+prices and partly due to a surge in domestic demand together with
+diminished cost competitiveness, which fueled import demand. For a brief
+period, from 1990 to 1992, the Krone was pegged to the ECU, before
+switching to a managed floating regime.
+
+As stated above, the production of oil and gas created enormous revenues
+for *Govt*. This revenue, together with the income from investment
+abroad (both financial and non-financial), boosted the income of *Govt*.
+In contrast, since 2000 three significant drops in *NL* can be
+identified: 2000-2003, 2008-2009 and 2012-2016. Investment of *Govt*
+seems to be quite stable, while savings is more sensitive to changes in
+business cycles. This means, that the fluctuations in *NL* should be
+explained by changes in savings (i.e. incomes and non-investment
+expenditures). While the first and third fall in *NL* can be explained
+mainly by a small decrease in income and an increase in consumption, the
+second fall is a reaction to the business cycle, where the Great
+Recession led to a drop in the income of the *Govt*.
+
+For *Pvt* disposable income increased more than consumption for the
+period as a whole, which increased the propensity to save. The level of
+investment also increased, which caused a change in the sign of *excess
+savings* several times over the period. While the increase in the saving
+is relatively smooth, due to the strong co-movement between income and
+consumption, investment fluctuates is more volatile. A drop at the
+beginning of the 2000s is followed by a rapid increase from 2000-2013
+only disconnected by a dip during the Great Recession. This rapid
+increase moved *NL* from 5% to -5%. After the crisis, *NL* fluctuated
+around zero.
+
+From the *NL* of the institutional sectors of Norway, the expectation is
+for an increase in the NFW position *Govt*, an equivalent decline for
+*RoW*, and marginal changes for *Pvt*. This is confirmed by Figure 3,
+for *Govt* and *RoW*, although *Pvt* experienced a steady decline in
+NFW, from roughly $- 40\%$ to $- 85\%$ of GDP, despite having periods of
+positive *NL*.
+
+This description of the three countries clearly highlights some major
+changes in the Scandinavian economy, where especially the changes in the
+current account for all three countries calls on attention.
+
+Analysis
+========
+
+Correlations and business cycles -- identifying major changes in the
+Scandinavian economy
+
+The data used in this analysis is from four sources, and has all been
+sourced in annual frequency. *NL* data is sourced primarily from the
+Eurostat database, but for Denmark it is supplemented with data from the
+ADAM (Annual Danish Aggregate Model) databank, which is affiliated with
+Statistics Denmark. This data is all normalized by dividing each entry
+by GDP of the country in question for each year. In this way, we were
+able to get annual data starting in 1950 for Sweden, 1970 for Denmark,
+and 1978 for Norway.
+
+The output gap[^12] data was available from the OECD database from 1985
+for all three countries. The output gap is calculated by estimating the
+potential level of GDP and calculating the proportionate difference
+between potential GDP and actual GDP.[^13] For robustness check, we used
+both OECD data from 1985, as well as our own calculations on data
+available from the Eurostat database and Statistics Sweden prior to
+1985. In order to get our own rough measure we applied the
+Hodrick-Prescott (HP) filter to annual data for each country. The
+results of which, are very similar to those available from OECD.
+
+The empirical analysis is comprised of two main parts. The first is a
+variance composition analysis, and measures how much of variation in
+*NL* of a particular sector can be explained by variation in each of the
+other sectors. The second is a business cycle covariance analysis, and
+takes the *NL* of each sector and compares the variations in *NL* to
+variations in the level of capacity utilization of the domestic country.
+These two analyses are described formally below.
+
+Statistical Properties
+----------------------
+
+Following the method presented in , a combination of national accounting
+and statistical properties can be used to provide information on *NL*
+behaviour across the economy; in particular, how the *NL* of different
+sectors co-moves. Since the sum of *NL* across the different sectors is
+zero, the variance of this sum can be written as:
+
+$$\sum_{}^{}{X_{i} = 0}$$
+
+Where $X_{i}$ represents *NL* of the single sector. Using the fact that,
+
+$$\sum_{i\  \neq j}^{}{Cov(X_{i},X_{j})} = 0$$
+
+the result for a single variable can be written as,
+
+$${Cov\ (X}_{i},X_{i}) = Var\left( X_{i} \right) = - \sum_{i\  \neq j}^{}{Cov(X_{i},X_{j})}$$
+
+The variance in $X_{i}$ is therefore equal to the negative sum of the
+covariances between $X_{i}$ and the other variables. This property can
+be used to investigate the decomposition of a change in *NL* in one
+sector on *NL* of other sectors.
+
+This can be extended to test the behavior of *NL* of a single sector
+relative to the business cycles. The business cycle is represented by
+the output gap, as discussed in the section on data above.
+
+$$\sum_{\text{i\ }}^{}{\text{Cov}\left( X_{i},Y \right) = 0}$$
+
+Where $Y$ represents the business cycle, while $X_{i}$ is *NL* of the
+single sector. If the covariance between *NL* in a sector and the output
+gap is positive, *NL* of the sector is counter-cyclical, while a
+negative covariance can be interpreted as pro-cyclical *NL* behavior.
+
+In this second part of this analysis, we conduct a test for possible
+lagged or leading co-variation between *NL* of individual sectors and
+the business cycle. The implication is that changes in *NL* of a sector
+might provide some information regarding general behavior within the
+sector relative to economic expansions and contractions.
+
+Results
+-------
+
+In this section we present a descriptive analysis of our results from
+the two statistical analyses described above.
+
+WHAT ABOUT A FIVE SECTOR?
+
+### The composition of net lending
+
+For each sector the variance in *NL* can be decomposed into its
+covariance[^14] with *NL* of the other sectors, which can be seen in
+Figure [\[fig:cov\_bars\_3sector\_Long\]](#fig:cov_bars_3sector_Long)
+below.[^15] In order to simplify the discussion, we will simply refer to
+whether a sector is positively related to or negatively related to
+another sector, whereby we mean more specifically, that *NL* in that
+sector is related to *NL* of the second sector.
+
+```{r covbarsDK3sectlong, fig.cap="DK: Covariance", out.width="0.49\\linewidth", fig.height=5, fig.width=5, echo=FALSE, warning=FALSE, message=FALSE}
+
+ggplot(DK_cov_Long_3sector_melt, aes(x=Var1, y=value, fill=Var2)) + 
+scale_fill_manual(name = NULL, values = c("#107831", "#443eff", "#ffc100"), 
+                  guide = guide_legend(reverse=TRUE)) +
+geom_bar(stat="identity", position = "stack") +
+xlab("\nSector") +
+ylab("Covariance")+
+coord_flip() +
+theme_bw() +
+theme(legend.position="bottom")
+``` 
+
+```{r covbarsNO3sectlong, fig.cap="NO: Covariance", out.width="0.49\\linewidth", fig.height=5, fig.width=5, echo=FALSE, warning=FALSE, message=FALSE}
+
+ggplot(NO_cov_Long_3sector_melt, aes(x=Var1, y=value, fill=Var2)) + 
+scale_fill_manual(name = NULL, values = c("#107831", "#443eff", "#ffc100"), 
+                  guide = guide_legend(reverse=TRUE)) +
+geom_bar(stat="identity", position = "stack") +
+xlab("\nSector") +
+ylab("Covariance")+
+coord_flip() +
+theme_bw() +
+theme(legend.position="bottom")
+``` 
+
+```{r covbarsSE3sectlong, fig.cap="SE: Covariance", out.width="0.49\\linewidth", fig.height=5, fig.width=5, echo=FALSE, warning=FALSE, message=FALSE}
+
+ggplot(SE_cov_Long_3sector_melt, aes(x=Var1, y=value, fill=Var2)) + 
+scale_fill_manual(name = NULL, values = c("#107831", "#443eff", "#ffc100"), 
+                  guide = guide_legend(reverse=TRUE)) +
+geom_bar(stat="identity", position = "stack") +
+xlab("\nSector") +
+ylab("Covariance")+
+coord_flip() +
+theme_bw() +
+theme(legend.position="bottom")
+``` 
+
+Figure 1: Covariances between net lending
+
+
+
+In case of Denmark, the analysis shows that *RoW* co-varies negatively
+with *Pvt* and *Govt*. This means, that an increase in *NL* of *RoW* is
+linked to decreases in *NL* in both *Pvt* and *Govt*. The effect seems
+to be largest in *Pvt*, while the changes in *RoW* are associated with a
+minor (and insignificant) negative changes in *Govt*[^16]. *Pvt* has a
+strong negative covariance with both *Govt* and *RoW*. An increase in
+*Pvt* is therefore associated with a fall in both *Govt* and *RoW*.
+Finally there is a negative covariance between a change in *RoW* and in
+both *Govt* and *Pvt*. The analysis is muted on causality, and thus the
+result could be interpreted from the perspectives of both the REH and
+KSGH --- where a negative change in *Pvt* would be expected to be
+associated with a positive change in *Govt*.
+
+The data for Norway reads a very different story due to negative
+covariances between *RoW* and both *Govt* and *Pvt*. A positive change
+in *NL* for *RoW* is therefore associated with a negative change in both
+*Govt* and *Pvt*. For *Pvt* there is a negative covariance with both
+*RoW* as stated above and *Govt*[^17]. A positive change in *Pvt* is
+therefore associated with a negative change in *RoW* and *Govt*. The
+Norwegian case could be interpreted on face-value to support the TDH,
+where one would expect strong positive negative correlation between the
+balances *RoW* and *Govt*.
+
+The analysis for Sweden tells a similar story to that for Denmark, but
+with more compelling evidence for a relationship between *RoW* and
+*Govt*. Again there is negative covariance between *RoW* and both *Govt*
+and *Pvt*. Thus, a positive change in *RoW* comes with a negative change
+in *Govt* and *Pvt*. Looking at *Govt*, the covariance with *RoW* is
+negative as stated above. The covariance between *Govt* and *Pvt* is
+also negative, which has the consequence that a negative change in
+*Govt* is associated with a positive change in *Pvt*. The Swedish case
+thus provides some support for both the REH and TDH.
+
+### Business cycle covariance of sectors
+
+This analysis illustrates the covariance between the sector in question
+and the level of the output gap (*OG*) on an annual basis, for three
+lagged and three leading years. This analysis allows us to find the sign
+of the covariance between *NL* in a single sector and the *OG*, in order
+to say something about the behavior over the business cycles. It also
+lets us see if a positive or negative net position for the sector in
+question leads or lags the business cycle, where position $0$ indicates
+a concurrent movement between sector net position and the *OG*.
+
+The results of this three-sector business cycle covariance test are
+illustrated in Figure XX
+below.[^18]
+
+```{r buscycDK3sectlong, fig.cap="DK: Covariance", out.width="0.2\\linewidth", fig.height=5, fig.width=5, echo=FALSE, warning=FALSE, message=FALSE}
+
+plot(DK_CCF_Long$L,DK_CCF_Long$pvt,type="l",col=c("#ffc100"), lty=c(1),ylim=c(-1,1),ylab="Covariance",xlab="Lags")
+lines(DK_CCF_Long$L,DK_CCF_Long$g,type="l",col=c("#443eff"), lty=c(2))
+lines(DK_CCF_Long$L,DK_CCF_Long$row,type="l",col=c("#107831"), lty=c(3))
+lines(DK_CCF_Long$L,DK_CCF_Long$pvt_sig_points,type="p",col=c("#443eff"), pch=c(1))
+lines(DK_CCF_Long$L,DK_CCF_Long$g_sig_points,type="p",col=c("#443eff"), pch=c(2))
+lines(DK_CCF_Long$L,DK_CCF_Long$row_sig_points,type="p",col=c("#107831"), pch=c(3))
+grid()
+abline(h=0, col="#000000")
+legend("bottomright",col=c("#ffc100", "#443eff", "#107831"), lwd=1.75,lty=c(1:3), legend=c("Priv","Govt","RoW"),bty='n')
+``` 
+
+```{r buscycNO3sectlong, fig.cap="NO: Covariance", out.width="0.2\\linewidth", fig.height=5, fig.width=5, echo=FALSE, warning=FALSE, message=FALSE}
+
+plot(NO_CCF_Long$L,NO_CCF_Long$pvt,type="l",col=c("#ffc100"), lty=c(1),ylim=c(-1,1),ylab="Covariance",xlab="Lags")
+lines(NO_CCF_Long$L,NO_CCF_Long$g,type="l",col=c("#443eff"), lty=c(2))
+lines(NO_CCF_Long$L,NO_CCF_Long$row,type="l",col=c("#107831"), lty=c(3))
+lines(NO_CCF_Long$L,NO_CCF_Long$pvt_sig_points,type="p",col=c("#443eff"), pch=c(1))
+lines(NO_CCF_Long$L,NO_CCF_Long$g_sig_points,type="p",col=c("#443eff"), pch=c(2))
+lines(NO_CCF_Long$L,NO_CCF_Long$row_sig_points,type="p",col=c("#107831"), pch=c(3))
+grid()
+abline(h=0, col="#000000")
+legend("bottomright",col=c("#ffc100", "#443eff", "#107831"), lwd=1.75,lty=c(1:3), legend=c("Priv","Govt","RoW"),bty='n')
+``` 
+
+```{r buscycSE3sectlong, fig.cap="SE: Covariance", out.width="0.2\\linewidth", fig.height=5, fig.width=5, echo=FALSE, warning=FALSE, message=FALSE}
+
+plot(SE_CCF_Long$L,SE_CCF_Long$pvt,type="l",col=c("#ffc100"), lty=c(1),ylim=c(-1,1),ylab="Covariance",xlab="Lags")
+lines(SE_CCF_Long$L,SE_CCF_Long$g,type="l",col=c("#443eff"), lty=c(2))
+lines(SE_CCF_Long$L,SE_CCF_Long$row,type="l",col=c("#107831"), lty=c(3))
+lines(SE_CCF_Long$L,SE_CCF_Long$pvt_sig_points,type="p",col=c("#443eff"), pch=c(1))
+lines(SE_CCF_Long$L,SE_CCF_Long$g_sig_points,type="p",col=c("#443eff"), pch=c(2))
+lines(SE_CCF_Long$L,SE_CCF_Long$row_sig_points,type="p",col=c("#107831"), pch=c(3))
+grid()
+abline(h=0, col="#000000")
+legend("bottomright",col=c("#ffc100", "#443eff", "#107831"), lwd=1.75,lty=c(1:3), legend=c("Priv","Govt","RoW"),bty='n')
+``` 
+
+These results provide some useful information, despite the fact that the
+test for lags or leads do not show any clear patterns[^19]. All three
+countries have negative covariance between *Pvt* and *OG*. This
+indicates that an a positive *OG* is associated with negative *NL*,
+which can be interpret as pro-cyclical *NL* behaviour (the sector thus
+net-borrows as capacity utilization rises). *NL* of *Govt* is positively
+related with the *OG*, so that an increase in the *OG* is associated
+with positive *NL*. This can be interpret as counter-cyclical *NL*
+behaviour (or stabilization borrowing and spending by *Govt* during
+downturns, and vice versa for expansionary periods), as it dampens the
+business cycle. For *RoW* no clear story can be told, since the
+correlation values are mostly insignificant and the sign depends
+strongly on the chosen number of lags.
+
+The relevance of this analysis is to shed light on the likely behaviours
+of the sectors at different points of the business cycle. For example,
+if *Govt* is likely to spend (and borrow) counter-cyclically, and *Pvt*
+pro-cyclically, then a negative correlation between *Pvt* and *Govt* may
+exist in the absence of any rational expectations. The obscurity of the
+relationship between *RoW* and *OG* may also cause us to question the
+notion that expansions in aggregate demand necessarily lead to an
+increase in imports, as the TDH would have us believe. Equally, the
+counter-cyclical spending of *Govt* may have nothing to do with
+intentions, and could simply be the result of pro-cyclical changes in
+the level of tax income in conjunction with sticky expenditures. To help
+grasp some of these potential dependencies we construct a simple model
+that incorporates the three sectors, while satisfying the *NL* identity
+in Equation $ID.2$.
+
+Discussion
+==========
+
+In this section several questions are raised. Firstly, we discuss the
+usefulness of investigating the sectoral balance for analyzing an
+economy. Secondly, we want to discuss the empirical results from the
+analyzing, including the robustness of the results. Thirdly, built on
+the two first discussions, we use the sectoral balances to discuss major
+changes in the Scandinavian economy.
+
+From the analysis its clear, that the movements in *NL* as stated by
+looking at the accounting identities affects each other. Since the sums
+of *NL* is zero as soon as *NL* of one sectors departures from zero, the
+*NL* of other sectors changes as well. In the first part of the analysis
+the bivariate covariances between *NL* for the sectors are presented,
+with some common results for the three countries. In all three countries
+the covariances between changes in *NL* for the *Pvt* and *RoW* are
+negative. Furthermore, for Denmark and Sweden, the covariances between
+*NL* for *Pvt* and *Govt* is negative(supporting the REH), while the
+relationships between these two sectors is insignificant in Norway. The
+covariances between *NL* for *Govt* and *RoW* in Norway is
+negative(supporting the TDH), while the relationships are insignificant
+for Denmark and Sweden. Does it mean, that if the *Pvt* NL increases in
+Denmark or Sweden, then the NL of the *Govt* automatic decreases? A good
+starting point for that discussion is to use an example from Sweden; the
+banking crisis in the early 1990s. As a result of the crisis, the
+private sector wanted to deleverage as recognized by BIS (2016), which
+can be seen by the positive net lending in the private sector in
+Sweden(in figure 2). As a result of this deleveraging in the private
+sector, also the public sector was affected. The lack of demand from the
+private sector led to a deterioration of the public balance. After the
+initial phase the need for deleveraging in the private sector faded out,
+which resulted in a deterioration of the public balance the public
+sector in Sweden managed to improve the balance again. A contrast to the
+story in Sweden can be seen in Japan also in the beginning of the 1990s.
+After the crisis, only the non-financial corporations deleveraged, while
+the households still showed sectoral deficits and thereby continued to
+increase their stock of debt . Since only a part of the private sector
+went through this deleveraging process initially, the public sectors
+weren't affected as much as in Sweden in the first place. On the other
+hand however, since the process of readjustment was extended over a
+longer period, the worsening of the public debt position lasted longer
+and actually ended up being worse, than in the case of Sweden. (BIS
+2016)
+
+This example clearly shows, that there are strong reasons for expecting
+a strong negative relationship between net lending in the private sector
+and the *Govt*.
+
+The first question to ask is however robust are these results in fact?
+
+Are the correlations constant over time?
+----------------------------------------
+
+
+
+Denmark
+
+
+
+Norway
+
+
+
+Sweden
+
+Major changes in Scandinavian Economy
+-------------------------------------
+
+Based on the analysis and the initial discussion, some major changes in
+the economy of the three countries can now be discussed. Since the
+middle of the 1990s the *NL* in *Govt* in Norway can be seen as almost
+the mirror-image of the fluctuations in *NL* of *RoW*. Before this
+change, no clear relationships could be found between these two sectors.
+As a matter of fact, running correlations between *NL* were actually
+positive in the end of the 1980s and first half of 1990s, where *NL* in
+the two sectors moved in the same direction.
+
+### Foreign Sector
+
+Since all three economies moves from current account deficits to current
+account surpluses around 1990, this indicate a major change in all three
+economies.
+
+Conclusion
+==========
+
+Ds
+
+References
+==========
