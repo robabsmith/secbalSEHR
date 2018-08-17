@@ -20,15 +20,15 @@ output:
     toc: no
   bookdown::epub_book: default
   bookdown::html_document2: default
-  rticles::elsevier_article: default
+  bookdown::word_document2: 
+    reference_docx: mystyles.docx
   bookdown::gitbook:
     config:
       toc:
         collapse: section
     self.contained: yes
     split_by: none
-  bookdown::word_document2: 
-    reference_docx: mystyles.docx
+  rticles::elsevier_article: default
 address:
 - address: MaMTEP, Department of Business and Management, Fibigerstr{\ae}de 2, Aalborg East
   code: 9220
@@ -1328,13 +1328,8 @@ SE_rolling_ts <- ts(SE_rolling_ts, start=(SE_start_year+years_rolling), freq=1)
 Introduction
 ============
 
-[as some examples, @trehan1991; @blanchard2002; @bernanke2005; @blanchard2007; @vansteenkiste2008]
-@aliabbas2011
-@christensenetal1995
-@abildgren2013
-
 Why is investigating sectoral balances important from a historical point
-of view? it is not interesting at all!!!
+of view?
 
 The interaction between broader institutional sectors of the economy has
 captured the intrigue of economists and policy makers at least since
@@ -1356,7 +1351,7 @@ one sector must have a counterpart in at least one other sector, where
 the accumulation of financial assets exceeds the accumulation of
 financial liabilities.
 
-Krugman (2009) uses the sectoral balances to explain what happened in
+@krugman2009 uses the sectoral balances to explain what happened in
 the American economy from a historical point of view. He specifically
 draws a major difference between the Great Recession and the Great
 Depression looking at the sectoral balances. He argues that the
@@ -1431,7 +1426,7 @@ Accounts (SNA). The SNA is often not seen as the prevailing tool for
 economic analysis. Reasons are among others that the System is
 considered to be targeted mainly to administrative uses such as for
 fiscal policy and international comparisons and that the architecture of
-the System is more or less cut in stone. (Bergman 2015)
+the System is more or less cut in stone. @bergman2015
 
 Background
 ----------
@@ -1442,12 +1437,12 @@ attempts to calculate the national income back to the end of the 19^th^
 century for Denmark and Norway and the beginning of the 20^th^ century
 for Sweden. Although the main focus of the paper is on the development
 of the national account from the real side of the economy, the authors
-do mention however, that already in the 1930s Frisch emphasizes the
-importance in the distinction between real(goods and services) and
-financial objects(claims and counterclaims), @christensenetal1995 [p. 35]
+do mention however, that already in the 1930s Frisch emphasized the
+importance in the distinction between real (goods and services) and
+financial objects (claims and counterclaims), @christensenetal1995 [p. 35]
 . Despite this point from Frisch, the financial side of the accounts
-didn't play a major role in the national account. The lack of
-information on the financial side of the economy, was not only a concern
+only played a minor role in the national accounts. The lack of
+information on the financial side of the economy was not only a concern
 for Frisch, but also Copeland in the U.S. and Denitez in France:
 
 >"When total purchases of our national product increase, where does the
@@ -1463,33 +1458,38 @@ SNA 93 guidelines for a fully specified system of financial accounts,
 including revaluation account, were given. @abildgren2008
 
 In 1990 the Norwegian national account system was updated with the
-purpose of fulfilling the recommendations in the SNA 1993 and the
-European standard in ESA 1995. Regarding the sectoral balances two
+purpose of fulfilling the recommendations in the SNA 1993 [@SNA1993] and the
+European standard in ESA 1995[@ESA1995]. Regarding the sectoral balances two
 important aspects were now taking into account: Firstly, the
 institutional sectoral account was establish, which separated the
 economy into five sectors(non-financial corporations, financial
 corporations, public sector, households and Rest of the World).
 Secondly, the financial part of the national account was improved
-significantly(Statistics Norway 2012). According to Statistic Norway
-2012, during the period of 1950s to 1990, the financial part of the
+significantly [@flottum2012]. According to @flottum2012, 
+during the period of 1950s to 1990, the financial part of the
 national account hasn't been developed as much as the real side of the
-national account. However, in Statistics Norway's publications 'Credit
-Market Statistics: Financial Sector Balance Sheet'(see e.g. Statistics
-Norway 1980) the stock of a number of financial assets can be seen at a
+national account. However, in Statistics Norway's publications "Credit
+Market Statistics: Financial Sector Balance Sheet" [see e.g., 
+@floettum1981] the stock of a number of financial assets can be seen at a
 sector-level decades earlier, but without the financial account being a
 part of this statistic. Also in Denmark, the financial balance sheets
 wasn't a part of the national account before statistic Denmark decided
-to follow the SNA 1993 and ESA 1995. According to Abildgaard (2008),
-Statistic Denmark didn't integrate financial account stock- and
-flow-data in the annual national accounts statistics before 2001. The
+to follow the SNA 1993 and ESA 1995. According to @abildgren2008,
+Statistic Denmark only integrated financial account stock- and
+flow-data in the annual national accounts statistics in 2001. The
 financial sectoral data provided since 2001 covers the period since
-primo 1995. Regarding the non-financial sectoral national account, no
+starting in 1995. Regarding the non-financial sectoral national account, no
 existing version of Danish historical national-account provide sectoral
 accounts before 1971. The two dataset can be connected using the net
 lending from the non-financial side as financial net lending on the
 financial side of the economy[^non-fin].
 
-In Bergman et. al (2010) the sectoral balances for the Swedish economy
+[^non-fin]: Unfortunately the net lending from the 'real' and 'financial'
+    method are not always equal, due to statistical uncertainty. In the
+    annual data for Denmark in the period 1995-2016 net lending are the
+    same using both methods.
+
+In @bergman2010 the sectoral balances for the Swedish economy
 is discussed. The authors point out, that balance sheets didn't attract
 much attention and that didn't play a role in economic analysis. The
 lack of balance sheet in the national account was according to statistic
@@ -1499,13 +1499,13 @@ Sweden also following the recommendations and standards in SNA 1993 and
 
 In Sweden the Swedish National Wealth Database shows national wealth and
 sectoral net lending back to 1810, @waldenstrom2016. From 1880 to 1901
-both Bollfras and Fahlbeck (Waldenström -- appendix) gave some estimates
+both Bollfras and Fahlbeck [@waldenstrom2017, p. 9] gave some estimates
 on the stock of wealth(and debt) in Sweden for the private sector and
 public sector in total. Their work did therefore not decompose the
 private and public sector. In the 1950s and 1970s more attempts were
 made to estimate the balance sheet of the household sector, but without
-much attention of the other sectors of the economy. In 1993 Werin
-created a financial balance sheet for all the sectors from 1945-1990.
+much attention of the other sectors of the economy. In 1993 Werin 
+created a financial balance sheet for all the sectors from 1945-1990 [@waldenstrom2017, p. 6].
 Following the recommendation in the development of SNA and ESA,
 Statistics Sweden offers both national and financial account for all
 institutional sectors in the economy.
@@ -1537,6 +1537,13 @@ bracket represents the sector balance for *RoW*[^5]. Broadly speaking,
 changes in the *NL* position are driven by changes in either the incomes
 or the expenditures of the sector in question, together with changes in
 sector investment behavior.
+
+[^5]: We use the terms net lending and saving surplus as synonymous,
+    despite the fact, that the two terms diverge from each other due to
+    capital transfers and acquisitions less disposals of non-produced
+    non-financial assets. These two accounts are however very small. The
+    values for net lending and saving surplus are thus very close to one
+    another.
 
 From equation ID.2, an important property for the sum of the *NL* across
 the three sectors can be seen, in that,
@@ -1585,6 +1592,7 @@ Literature Review
 
 Literature review on how sectoral balances are dealt with
 
+### Theoretical aspects
 
 The sectoral financial balances analysis (*SFB*), as a tool for
 analysis, has received some attention in recent years, and is based on
@@ -1598,7 +1606,7 @@ Treasury -- although the inspiration can also attributed further back to
 Keynes and many others such as François Quesnay. As noted by
 [@godleylavoie2012 p. 24], the initial interest of Copeland in the 1940s
 was to investigate the financing requirements of economic activity
-between and across the national sectors[^8]. The SFB approach could be
+between and across the national sectors[^esalaw]. The SFB approach could be
 described as a continuation of Copeland's goals with the aid of modern
 technology. The work of Wynne Godley together with other key authors
 [@godleycripps1983; @godleyzezza1989; @godleyzezza1992; @godley1999b; @godley1999a; @godley2004; @godleylavoie2001; @godleylavoie2012]
@@ -1609,6 +1617,15 @@ data on the financial side of the economy, Godley, together with several
 collaborators, conducted truly pioneering work in integrating the real
 and financial sides of the economy in a unified macroeconomic modelling
 framework.
+
+[^esalaw]: Adequate data for such a presentation of the financial side of the
+    economy only became available much later in the 1970s and 1980s, and
+    was formalised in the System of National Accounts in 1993 (1993
+    SNA). These accounts were revised again in 2008, and for the
+    European Union, a the most recent version is the European regional
+    and sector accounts 2010 [@ESA2010], published in the official
+    journal of the European Union by the [@ESA2010law].
+
 
 From a theoretically point of view, the interaction between the balances
 of the sectors is usually explained by either The Ricardian Equivalence
@@ -1660,8 +1677,9 @@ leads the business cycle. In both Denmark and Sweden, net borrowing of
 households and non-financial corporations is pro-cyclical, while net
 borrowing in *Govt* is counter-cyclical. For Denmark *NL* of *RoW* is
 counter-cyclical and *NL* of financial corporations is pro-cyclical,
-neither of which show significant patterns for Sweden. In , the REH and
-TDH are rejected, fully in line with the conclusion in xxx.
+neither of which show significant patterns for Sweden. In [@Rezai2017],
+the REH and TDH are rejected, fully in line with the conclusion in
+[@Barbosa2006].
 
 In @Barbosa2006 a graphical presentation of *NL* of the five institutional
 sectors for both the US (for 1947-2004), and a panel of developing
@@ -1689,30 +1707,30 @@ current account balances, and a quarterly structural VAR.
 These contributions are more focused on either the validity of TDH or
 REH in a group of countries or to explain the effect of i.e. fiscal
 policy in general. None of these papers try to provide information of
-specific event using the sectoral balances approach. In 
-@vantreeck2012, an empirical analysis of the three
-sector balance is used to discuss the possible outcomes of the Stability
+specific event using the sectoral balances approach. 
+In [@vantreeck2012], an empirical analysis of the three sector
+balance is used to discuss the possible outcomes of the Stability
 Pact program from 2011-2014, where the authors seriously question the
 reliability of predicted results from the European Commission. Given the
 predictions of the growth rates in each economy and the assumption for
 the financial balance for *Govt* and *RoW*, [@vantreeck2012] simulate
 and evaluate the implicitly assumed prediction for *Pvt*.
 
-@brink1983 argued that the major
-reason for the negative *Govt* *NL* in Denmark during the 1970s and
+@brink1983 argued that the major reason for the negative 
+*Govt* *NL* in Denmark during the 1970s and
 1980s was due to low demand from abroad as a result of the global
 economic downturn and financial consolidation in *Pvt*, where the
-savings exceeded the investments. As stated by Krugman (2009), the
+savings exceeded the investments. As stated by @krugman2009, the
 government deficit, is due to automatic stabilizers rather than
-expansionary fiscal policy. It doesn't imply however, that discretionary
-policy doesn't affect the balance, since these policies directly has an
-effect on the balances in the private sector as well as the Rest of the
-World. In case of a lower propensity to import in the *Govt* compared to
-the private sector, an increase in the public consumption financed by an
+expansionary fiscal policy. It does not imply however, that discretionary
+policy has no effect on the balance, since these policies directly have an
+effect on the balances in *Pvt* as well as *RoW*. In case of a 
+lower propensity to import in *Govt* compared to
+*Pvt*, an increase in public consumption financed by an
 increase in taxes leads to an increase in *NL* in *Pvt*, while the *NL*
-in RoW falls(improvements of the current account). @brink1983.
+in *RoW* falls (improvements of the current account). [@brink1983]
 
-BIS (2016) uses the banking crisis in Sweden in the early 1990s as a
+@tissot2016 used the banking crisis in Sweden in the early 1990s as a
 case for the relevance of sectoral balance approach. As a result of the
 crisis, the private sector wanted to deleverage, which can be seen by
 the steep increase in net lending in the private sector in Sweden
@@ -1722,8 +1740,8 @@ lack of demand from the private sector led to a deterioration of the
 public balance. After the initial phase the need for deleveraging in the
 private sector faded out, which resulted in a deterioration of the
 public balance the public sector in Sweden managed to improve the
-balance again. In a working paper from Statistics Sweden, Bergman et.
-al.(2010) analyses the changes in balance sheets across the different
+balance again. In a working paper from Statistics Sweden, @bergman2010
+analyses the changes in balance sheets across the different
 sectors of the economy during 2008-2009 following the financial and
 economic crisis. Discussing the foreign debt, they link the changes in
 balance sheet across time with the net lending of rest of the world.
@@ -1735,21 +1753,8 @@ liabilities held abroad), as seen in equation 3 in this paper.
 The Three Economies
 ===================
 
-Figure 1 shows *NL* as well as NFW for the three main sectors for
+Figures \ref{fig:B9DK} and \ref{fig:BF90DK} show *NL* and NFW for the three main sectors for
 Denmark.
-
-```{r BF90DK, fig.cap="DK: Net Financial Wealth", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
-par(mfrow=c(1, 1))
-par(mar=c(4,4,2,2))
-
-plot.ts(DK_eurostat_BF90_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
-        col=c("#107831", "#443eff", "#ffc100"), 
-        ylab = "Per cent GDP")
-abline(h=0, col="#000000")
-legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
-       lwd=3,lty=c(3:1), legend=colnames(DK_eurostat_BF90_3sector_ts),bty='n')
-grid()
-```
 
 ```{r B9DK, fig.cap="DK: Net Lending", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
 par(mfrow=c(1, 1))
@@ -1764,7 +1769,19 @@ plot.ts(DK_B9_Long_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1),
     grid()
 
 ```
-Figure 1: Net lending and financial net wealth, Denmark.
+
+```{r BF90DK, fig.cap="DK: Net Financial Wealth", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
+par(mfrow=c(1, 1))
+par(mar=c(4,4,2,2))
+
+plot.ts(DK_eurostat_BF90_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
+        col=c("#107831", "#443eff", "#ffc100"), 
+        ylab = "Per cent GDP")
+abline(h=0, col="#000000")
+legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
+       lwd=3,lty=c(3:1), legend=colnames(DK_eurostat_BF90_3sector_ts),bty='n')
+grid()
+```
 
 As shown above, *NL* for *Govt* was negative from 1972 to the late
 1990s, with the exception of a few years of positive *NL* in the late
@@ -1805,7 +1822,7 @@ of more than 25 years of current account deficit, which resulted in the
 accumulation of foreign denominated *Govt* debt, and an associated net
 foreign liability position to *RoW*. Aside from the high public debt,
 this period was characterized by borrowing of *Pvt* and high inflation,
-which deteriorates the current account (XXX?). In order to boost Danish
+which deteriorates the current account [@leszczuk2016]. In order to boost Danish
 exports, the Danish krone was devalued several times between 1978 and
 1982. Disinflationary policies were also used to increase international
 competitiveness and tax policy was used to enforce a balanced budget for
@@ -1826,17 +1843,17 @@ from 2005-2015 were primarily driven by improvements in the net export
 of services and net transfers from abroad (income from both direct and
 financial investment, and wages) .
 
-Figure \ref{fig:B9BF90DK}b shows NFW of the
+Figure \ref{fig:BF90DK} shows NFW of the
 individual sectors. The introduction of capital gains is beyond the
 scope of this paper, and is the reason for the misalignment between the
-cumulative result in Figure \ref{fig:B9BF90DK}a and
-*NL* in Figure \ref{fig:B9BF90DK}b. The effect of
+cumulative result in Figure \ref{fig:B9DK} and
+*NL* in Figure \ref{fig:BF90DK}. The effect of
 accumulated liabilities can be seen for Denmark in terms of foreign
 denominated *Govt* debt leading up to the 1990s. The persistent foreign
 deficit, and the debt related to it, were huge problems for the Danish
-economy, as discussed by (BRINK?).
+economy, as discussed by @brink1983.
 
-According to (XXX?), in the 1950s and 1960s Denmark and Sweden They
+According to @iversen2011, in the 1950s and 1960s Denmark and Sweden They
 noted that the three decades to follow remained export led, but changed
 dramatically from relatively protected to two of the most open and
 internationally integrated countries in Europe, with the political
@@ -1846,32 +1863,33 @@ perspective, both countries followed policies with Keynesian roots, but
 following the OPEC oil crises of the early 1970s, both suffered from
 expanding *Govt* deficits, inflation and upward wage pressures.
 
-In Denmark the net financial wealth (NFW) of *Govt* was -40% of GDP in
+In Denmark the net financial wealth (NFW) of *Govt* was $-40\%$ of GDP in
 1995. Between 1995 to 2005 the the net financial deficit was reduced to
 a close to neutral position, and remained fairly stable since. The NFW
-of *RoW* in Denmark declined continuously throughout the period, from
+of *RoW* in Denmark declined continuously throughout the period, from   
 $30\%$ of GDP to $- 50\%$ of GDP. Finally, the NFW of *Pvt* illustrates
 what appear to be two entirely different regimes; the first as a stead
 decline, between 1995 and 2007, where total NFW was negative between
-2007 and 2009[^7]. The second appears as a rapid accumulation following
+2007 and 2009[^nfwreg1]. The second appears as a rapid accumulation following
 2009, where the sector as a whole increased its financial NFW to $60\%$
-of GDP --- a dramatic consolidation of the sector[^8]
+of GDP --- a dramatic consolidation of the sector[^nfwreg2]
 
-Figure 2 shows *NL* as well as NFW for the three main sectors for
+[^nfwreg1]: Data for *Pvt* lending illustrate accelerated expansion of debt
+    leading up to 2007, in conjunction with a collapse in financial
+    asset prices following the crisis in 2008-9. The ratio of financial
+    assets to liabilities in *Pvt* is somewhat neutralized by the offset
+    of sub-sector holdings against one another, specifically FC holds
+    the counterclaims of both HH and NFC, and NFC equity represents a
+    counterclaim of many HH and FC assets.
+    
+[^nfwreg2]: The recovery of financial asset prices following the crisis
+    appears to have benefited *Pvt* for all three of the countries in
+    the analysis. Denmark in particular seems to have benefited from
+    this process, with equity prices having risen by $228\%$ since 2010
+    --- Followed closely by Norway and Sweden.
+
+Figures \ref{fig:B9SE} and \ref{fig:BF90SE} show *NL* as well as NFW for the three main sectors for
 Sweden. *NL* is normalized by the $\text{GDP}$
-
-```{r BF90SE, fig.cap="SE: Net Financial Wealth", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
-par(mfrow=c(1, 1))
-par(mar=c(4,4,2,2))
-
-plot.ts(SE_eurostat_BF90_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
-        col=c("#107831", "#443eff", "#ffc100"), 
-        ylab = "Per cent GDP")
-abline(h=0, col="#000000")
-legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
-       lwd=3,lty=c(3:1), legend=colnames(SE_eurostat_BF90_3sector_ts),bty='n')
-grid()
-```
 
 ```{r B9SE, fig.cap="SE: Net Lending", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
 par(mfrow=c(1, 1))
@@ -1886,7 +1904,19 @@ plot.ts(SE_B9_Long_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1),
     grid()
 
 ```
-Figure 2 Net lending and financial net wealth, Sweden
+
+```{r BF90SE, fig.cap="SE: Net Financial Wealth", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
+par(mfrow=c(1, 1))
+par(mar=c(4,4,2,2))
+
+plot.ts(SE_eurostat_BF90_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
+        col=c("#107831", "#443eff", "#ffc100"), 
+        ylab = "Per cent GDP")
+abline(h=0, col="#000000")
+legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
+       lwd=3,lty=c(3:1), legend=colnames(SE_eurostat_BF90_3sector_ts),bty='n')
+grid()
+```
 
 Historically, *NL* for the Swedish economy fluctuated around $0\%$ of
 GDP for all three sectors from 1950 to the middle of the 1970s. For both
@@ -1921,61 +1951,59 @@ the Great Recession are therefore associated with positive *NL* in
 *Govt*, and after the crisis the levels of savings and investment once
 again converged. Reflecting balanced government budget politics.
 
-*NL* of *RoW* fluctuated between 5% and -5% in the period of 1975 to the
+*NL* of *RoW* fluctuated between $5\%$ and $-5\%$ in the period of 1975 to the
 end of the 1990s. explained that by the mid 1980s Sweden had experienced
 prolonged inflation that was higher than most other countries. This,
 together with fixed exchange rate arrangements, resulted in steady real
 exchange rate appreciation and declining competitiveness of Swedish
-firms[^9]. This jeopardised export based economic growth policies and
+firms[^intcomp]. This jeopardised export based economic growth policies and
 thus was accompanied by occasional deliberate devaluations of the
 Swedish Krona --- six after 1973. Since 2000 *NL* of *RoW* has
 maintained a negative annual balance of more than $5\%$ of GDP.
 
+[^intcomp]: Both countries experienced increasing concentration of GDP in
+    large firms. According to , the share of GDP contributed by the top
+    ten corporations by revenue rose from $11\%$ in 1982 to $23\%$ in 1994,
+    and finally to $47\%$ in 2006 for Denmark.
+
 For Sweden the NFW position of *Pvt* is negative, but unlike Denmark,
 the position remains negative, in contrast to what might be expected
 from the positive *NL* balance of the sector over the entire period of
-1995 to 2016[^10]. The trend in the net asset position of *RoW*,
+1995 to 2016[^negscope]. The trend in the net asset position of *RoW*,
 however, follows the *NL* position, which is negative throughout the
 period. *Govt* *NL* in marginally positive, and its NFW position
 improves throughout, initially negative, and gradually moving to
 positive $20\%$ of GDP.
 
-Interestingly, xxxx noted that using a flat rate tax deduction (though
-omitting progressive tax rates) on interest payments, the Swedish
-household sector had negative costs of borrowing from before 1960 until
-1990. and both noted extensive deregulation of both the Danish and
-Swedish financial markets between 1980 and 1990, the last of which for
-Sweden included deregulation of international capital flows and the
-establishment of a new money market with options and derivatives. These
-deregulations permitted Swedish households to take advantage of the low
-interest rate environment. explained that 1992 saw massive credit losses
-in the Swedish *Pvt*, associated with the deregulations that preceded.
-This was combined with an international economic slowdown, a European
-currency crisis, and a *Govt* financial crisis -- followed by a
-reconstruction of the tax system. All of which led to the abandonment of
-the official fixed exchange rate system, a massive depreciation of the
-Swedish Krona and the start of the worst crisis in Sweden since the
-1930s. Unemployment rose from 1.5% to 8.2%, together with a substantial
-decline in per capita GDP (adjusted for international purchasing power).
+[^negscope]: This negative position can be explained by closer inspection of
+    the underlying components of the net balance sheet positions of the
+    sub-sectors of *Pvt*. A detailed exposition of the underlying
+    components of the net balances is beyond the scope of this paper.
 
-In Figure 3, *NL* as well as NFW for the three main sectors for Norway
+Interestingly, @englund1999 noted that using a flat rate tax deduction
+(though omitting progressive tax rates) on interest payments, the
+Swedish household sector had negative costs of borrowing from before
+1960 until 1990. @iversen2011 and @englund1999 both noted extensive
+deregulation of both the Danish and Swedish financial markets between
+1980 and 1990, the last of which for Sweden included deregulation of
+international capital flows and the establishment of a new money market
+with options and derivatives. These deregulations permitted Swedish
+households to take advantage of the low interest rate environment.
+@englund1999 explained that 1992 saw massive credit losses in the
+Swedish *Pvt*, associated with the deregulations that preceded. This was
+combined with an international economic slowdown, a European currency
+crisis, and a *Govt* financial crisis -- followed by a reconstruction of
+the tax system. All of which led to the abandonment of the official
+fixed exchange rate system, a massive depreciation of the Swedish Krona
+and the start of the worst crisis in Sweden since the 1930s.
+Unemployment rose from $1.5\%$ to $8.2\%$, together with a substantial decline
+in per capita GDP (adjusted for international purchasing power).
+
+In Figures \ref{fig:B9DK} and \ref{fig:BF90NO}, *NL* as 
+well as NFW for the three main sectors for Norway
 can be seen. *NL* is once again normalized by $\text{GDP}$, and it is
 worth noting the huge scale of Norwegain NFW, when compared with Denmark
 and Sweden.
-
-
-```{r BF90NO, fig.cap="NO: Net Financial Wealth", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
-par(mfrow=c(1, 1))
-par(mar=c(4,4,2,2))
-
-plot.ts(NO_eurostat_BF90_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
-        col=c("#107831", "#443eff", "#ffc100"), 
-        ylab = "Per cent GDP")
-abline(h=0, col="#000000")
-legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
-       lwd=3,lty=c(3:1), legend=colnames(NO_eurostat_BF90_3sector_ts),bty='n')
-grid()
-```
 
 ```{r B9NO, fig.cap="NO: Net Lending", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
 par(mfrow=c(1, 1))
@@ -1991,7 +2019,18 @@ plot.ts(NO_B9_Long_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1),
 
 ```
 
-Figure 3 Net Lending and Financial net Wealth, Norway
+```{r BF90NO, fig.cap="NO: Net Financial Wealth", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
+par(mfrow=c(1, 1))
+par(mar=c(4,4,2,2))
+
+plot.ts(NO_eurostat_BF90_3sector_ts, plot.type="single", axes=TRUE, lwd=3,lty=c(3:1), 
+        col=c("#107831", "#443eff", "#ffc100"), 
+        ylab = "Per cent GDP")
+abline(h=0, col="#000000")
+legend("bottomleft",col=c("#107831", "#443eff", "#ffc100"),
+       lwd=3,lty=c(3:1), legend=colnames(NO_eurostat_BF90_3sector_ts),bty='n')
+grid()
+```
 
 *NL* for the sectors of the Norwegian economy is markedly different from
 the Danish and Swedish cases. In contrast to Sweden and Denmark, *NL* of
@@ -2004,13 +2043,13 @@ but remain negative and positive on an annual basis respectively.
 
 For Norway, the persistent current account surplus has emerged in the
 form of a large *Govt* owned, foreign denominated asset, the Government
-Pension Fund Global[^11]. Up through the 1970s and 1980s the current
-account fluctuated between -5% and 5%, before it in 1989 for the last
+Pension Fund Global[^govpen]. Up through the 1970s and 1980s the current
+account fluctuated between $-5\%$ and $5\%$, before it in 1989 for the last
 time was negative. The export of oil and gas can be seen as a important
 aspect of this transition, which can be demonstrated by looking at the
 history of the Norwegian oil production. In 1974 the export and oil and
-gas amounted to 2.4% of the total export of goods; 10 years later, in
-1984, the share was increased to more than 50%, which was still the case
+gas amounted to $2.4\%$ of the total export of goods; 10 years later, in
+1984, the share was increased to more than $50\%$, which was still the case
 in 2013 . In the latter half of the 1980s the combination of low
 domestic demand (lower import) and high demand abroad (not only for
 petroleum, but also for Norwegian goods and services) gave rise to a
@@ -2022,6 +2061,9 @@ generated huge positive net exports, while low prices had the opposite
 effect. The low oil price since 2014 has also clearly had a negative
 effect on revenues and the surplus on the current account has declined
 notably.
+
+[^govpen]: The market value of the Government Pension Fund as of the second
+    quarter of 2017 was 8 238 billion Norwegian kroner.
 
 As explained, by investing the surplus from the oil production abroad,
 the rate of return was independent of the Norwegian economy and the
@@ -2066,12 +2108,12 @@ is relatively smooth, due to the strong co-movement between income and
 consumption, investment fluctuates is more volatile. A drop at the
 beginning of the 2000s is followed by a rapid increase from 2000-2013
 only disconnected by a dip during the Great Recession. This rapid
-increase moved *NL* from 5% to -5%. After the crisis, *NL* fluctuated
+increase moved *NL* from $5\%$ to $-5\%$. After the crisis, *NL* fluctuated
 around zero.
 
 From the *NL* of the institutional sectors of Norway, the expectation is
 for an increase in the NFW position *Govt*, an equivalent decline for
-*RoW*, and marginal changes for *Pvt*. This is confirmed by Figure 3,
+*RoW*, and marginal changes for *Pvt*. This is confirmed in Figure \ref{fig:BF90DK},
 for *Govt* and *RoW*, although *Pvt* experienced a steady decline in
 NFW, from roughly $- 40\%$ to $- 85\%$ of GDP, despite having periods of
 positive *NL*.
@@ -2095,15 +2137,23 @@ by GDP of the country in question for each year. In this way, we were
 able to get annual data starting in 1950 for Sweden, 1970 for Denmark,
 and 1978 for Norway.
 
-The output gap[^12] data was available from the OECD database from 1985
+The output gap[^outgap] data was available from the OECD database from 1985
 for all three countries. The output gap is calculated by estimating the
 potential level of GDP and calculating the proportionate difference
-between potential GDP and actual GDP.[^13] For robustness check, we used
+between potential GDP and actual GDP.[^outgapmeth] For robustness check, we used
 both OECD data from 1985, as well as our own calculations on data
 available from the Eurostat database and Statistics Sweden prior to
 1985. In order to get our own rough measure we applied the
 Hodrick-Prescott (HP) filter to annual data for each country. The
 results of which, are very similar to those available from OECD.
+
+[^outgap]: The reciprocal of the output gap can also be interpreted as a
+    very rough measure of capacity utilization.
+    
+[^outgapmeth]: In practice this can be achieved in numerous ways, and according
+    to the , the methodology for each country can be somewhat different,
+    but it varies between complex estimations of components of output,
+    and simple detrending of long run output.
 
 The empirical analysis is comprised of two main parts. The first is a
 variance composition analysis, and measures how much of variation in
@@ -2164,12 +2214,23 @@ the two statistical analyses described above.
 ### The composition of net lending
 
 For each sector the variance in *NL* can be decomposed into its
-covariance[^14] with *NL* of the other sectors, which can be seen in
-Figure [\[fig:cov\_bars\_3sector\_Long\]](#fig:cov_bars_3sector_Long)
-below.[^15] In order to simplify the discussion, we will simply refer to
+covariance[^deccov] with *NL* of the other sectors, which can be seen in
+Figures \ref{fig:covbarsDK3sectlong}, \ref{fig:covbarsNO3sectlong} 
+and \ref{fig:covbarsSE3sectlong} below[^robust]. 
+In order to simplify the discussion, we will simply refer to
 whether a sector is positively related to or negatively related to
 another sector, whereby we mean more specifically, that *NL* in that
 sector is related to *NL* of the second sector.
+
+[^deccov]: Due to the inability to statistically test covariance, all
+    covariances have been converted to correlation coefficients, and
+    tested for statistical significance. The results can be found in the
+    appendix.
+
+[^robust]: For a robustness check, results based on pre-1985 dataset and
+    post-1985 dataset can be found in the appendix. The conclusions
+    drawn from these results are the same as presented for the dataset
+    of the full sample.
 
 ```{r covbarsDK3sectlong, fig.cap="DK: Covariance", out.width="0.49\\linewidth", fig.height=5, fig.width=5, echo=FALSE, warning=FALSE, message=FALSE}
 
@@ -2210,15 +2271,11 @@ theme_bw() +
 theme(legend.position="bottom")
 ``` 
 
-Figure 1: Covariances between net lending
-
-
-
 In case of Denmark, the analysis shows that *RoW* co-varies negatively
 with *Pvt* and *Govt*. This means, that an increase in *NL* of *RoW* is
 linked to decreases in *NL* in both *Pvt* and *Govt*. The effect seems
 to be largest in *Pvt*, while the changes in *RoW* are associated with a
-minor (and insignificant) negative changes in *Govt*[^16]. *Pvt* has a
+minor (and insignificant) negative changes in *Govt*[^corcoefDK]. *Pvt* has a
 strong negative covariance with both *Govt* and *RoW*. An increase in
 *Pvt* is therefore associated with a fall in both *Govt* and *RoW*.
 Finally there is a negative covariance between a change in *RoW* and in
@@ -2227,15 +2284,22 @@ result could be interpreted from the perspectives of both the REH and
 KSGH --- where a negative change in *Pvt* would be expected to be
 associated with a positive change in *Govt*.
 
+[^corcoefDK]: The correlation coefficient between *NL* in *Govt* and *RoW* has
+    a p-value of 0.13, and is therefore not significant at a $10\%$
+    level of significance.
+
 The data for Norway reads a very different story due to negative
 covariances between *RoW* and both *Govt* and *Pvt*. A positive change
 in *NL* for *RoW* is therefore associated with a negative change in both
 *Govt* and *Pvt*. For *Pvt* there is a negative covariance with both
-*RoW* as stated above and *Govt*[^17]. A positive change in *Pvt* is
+*RoW* as stated above and *Govt*[^negcovNO]. A positive change in *Pvt* is
 therefore associated with a negative change in *RoW* and *Govt*. The
 Norwegian case could be interpreted on face-value to support the TDH,
 where one would expect strong positive negative correlation between the
 balances *RoW* and *Govt*.
+
+[^negcovNO]: This value is small, and the correlation coefficient has a
+    p-value of 0.54, which is well outside of any normal limits.
 
 The analysis for Sweden tells a similar story to that for Denmark, but
 with more compelling evidence for a relationship between *RoW* and
@@ -2272,9 +2336,9 @@ negative(supporting the TDH), while the relationships are insignificant
 for Denmark and Sweden. Does it mean, that if the *Pvt* NL increases in
 Denmark or Sweden, then the NL of the *Govt* automatic decreases? An often used example from Sweden of this relationship is the
 banking crisis in the early 1990s. As a result of the crisis, the
-private sector wanted to deleverage as recognized by BIS (2016), which
+private sector wanted to deleverage as recognized by @tissot2016, which
 can be seen by the positive net lending in the private sector in
-Sweden(in figure 2). As a result of this deleveraging in the private
+Sweden (in Figure \ref{fig:B9SE}). As a result of this deleveraging in the private
 sector, also the public sector was affected. The lack of demand from the
 private sector led to a deterioration of the public balance. After the
 initial phase the need for deleveraging in the private sector faded out,
@@ -2288,8 +2352,7 @@ went through this deleveraging process initially, the public sectors
 weren't affected as much as in Sweden in the first place. On the other
 hand however, since the process of readjustment was extended over a
 longer period, the worsening of the public debt position lasted longer
-and actually ended up being worse, than in the case of Sweden. (BIS
-2016)
+and actually ended up being worse, than in the case of Sweden. [@tissot2016]
 
 This example clearly shows, that there are strong reasons for expecting
 a strong negative relationship between net lending in the private sector
