@@ -1325,7 +1325,7 @@ SE_rolling_ts <- ts(SE_rolling_ts, start=(SE_start_year+years_rolling), freq=1)
     Aalborg University, Fibigerstræde 2, Aalborg East, 
     email: rs\@business.aau.dk
 
-Introduction
+Introduction {#sec:intro}
 ============
 
 Why is investigating sectoral balances important from a historical point
@@ -1408,7 +1408,7 @@ in section 2.1. In we discuss relevant literature, and in we discuss the
 data, methods and results of our empirical analysis. This is followed by
 a brief discussion in and we conclude in.
 
-Sectoral Balances approach
+Sectoral Balances approach {#sec:sectorbal}
 ==========================
 
 Terminology -- interpretation
@@ -1428,7 +1428,7 @@ considered to be targeted mainly to administrative uses such as for
 fiscal policy and international comparisons and that the architecture of
 the System is more or less cut in stone. @bergman2015
 
-Background
+Background {#sec:background}
 ----------
 
 In @christensenetal1995 a survey on the Nordic National Account
@@ -1510,7 +1510,7 @@ Following the recommendation in the development of SNA and ESA,
 Statistics Sweden offers both national and financial account for all
 institutional sectors in the economy.
 
-Accounting
+Accounting {#sec:accounting}
 ----------
 
 In this section the concepts of net lending (*NL*) is introduced.
@@ -1533,12 +1533,12 @@ Where $S_{p}$ is *Pvt* savings, $\text{NT}$ is tax payments received by
 $\text{NIA}$ is the net income and current transfers received from
 abroad. The first bracket expresses the sector balance for *Pvt*, the
 second bracket expresses the sector balance for *Govt*, and the third
-bracket represents the sector balance for *RoW*[^5]. Broadly speaking,
+bracket represents the sector balance for *RoW*[^lendsave]. Broadly speaking,
 changes in the *NL* position are driven by changes in either the incomes
 or the expenditures of the sector in question, together with changes in
 sector investment behavior.
 
-[^5]: We use the terms net lending and saving surplus as synonymous,
+[^lendsave]: We use the terms net lending and saving surplus as synonymous,
     despite the fact, that the two terms diverge from each other due to
     capital transfers and acquisitions less disposals of non-produced
     non-financial assets. These two accounts are however very small. The
@@ -1587,8 +1587,8 @@ term story, capital gains are ignored in this description.
 
 It is however important to point out, that while the equation for wealth accumulation above indicates, that *NL* affects wealth, the causality of course runs in both directions, since the *NL* also depends on the stock of wealth. This means, that in order to analyse the *NL* behaviour the financial status of a given sector also needs to be taken into account.  
 
-Literature Review
------------------
+Literature review {#sec:literature}
+=================
 
 Literature review on how sectoral balances are dealt with
 
@@ -1734,7 +1734,7 @@ in *RoW* falls (improvements of the current account). [@brink1983]
 case for the relevance of sectoral balance approach. As a result of the
 crisis, the private sector wanted to deleverage, which can be seen by
 the steep increase in net lending in the private sector in Sweden
-following the crisis (in figure 2). As a result of this deleveraging in
+following the crisis (in Figure \ref{fig:B9SE}). As a result of this deleveraging in
 the private sector, also the public sector was massively affected. The
 lack of demand from the private sector led to a deterioration of the
 public balance. After the initial phase the need for deleveraging in the
@@ -1750,10 +1750,10 @@ the World hasn't fallen to the same degree. They explain this
 discrepancy with capital gains(revaluation of the Swedish stock of
 liabilities held abroad), as seen in equation 3 in this paper.
 
-The Three Economies
+The Three Economies {#sec:thethree}
 ===================
 
-Figures \ref{fig:B9DK} and \ref{fig:BF90DK} show *NL* and NFW for the three main sectors for
+Figures \ref{fig:B9DK} and \ref{fig:BF90DK} show *NL* and net financial wealth (NFW) for the three main sectors for
 Denmark.
 
 ```{r B9DK, fig.cap="DK: Net Lending", out.width="0.49\\linewidth", fig.height=5, fig.width=7, echo=FALSE, warning=FALSE, message=FALSE}
@@ -1806,7 +1806,7 @@ the Great Recession, where the level of investment exceeded the level of
 savings. A major contribution to this positive *NL* can be found in the
 expansion of the labour market pensions scheme as a part of a collective
 bargaining agreement in 1991 . According to empirical results from
-DØRS?, DKK 1 of pension contributions increases the overall savings for
+@dors2008, DKK 1 of pension contributions increases the overall savings for
 *Pvt* by between DKK 0.80 and DKK 0.85. Thus, even though the pension
 contribution crowds out other savings, the overall effect on sector
 savings is positive. In the aftermath of the crisis, *NL* of *Pvt*
@@ -1863,7 +1863,7 @@ perspective, both countries followed policies with Keynesian roots, but
 following the OPEC oil crises of the early 1970s, both suffered from
 expanding *Govt* deficits, inflation and upward wage pressures.
 
-In Denmark the net financial wealth (NFW) of *Govt* was $-40\%$ of GDP in
+In Denmark the NFW of *Govt* was $-40\%$ of GDP in
 1995. Between 1995 to 2005 the the net financial deficit was reduced to
 a close to neutral position, and remained fairly stable since. The NFW
 of *RoW* in Denmark declined continuously throughout the period, from   
@@ -2050,11 +2050,11 @@ aspect of this transition, which can be demonstrated by looking at the
 history of the Norwegian oil production. In 1974 the export and oil and
 gas amounted to $2.4\%$ of the total export of goods; 10 years later, in
 1984, the share was increased to more than $50\%$, which was still the case
-in 2013 . In the latter half of the 1980s the combination of low
+in 2013 [@NPD2013]. In the latter half of the 1980s the combination of low
 domestic demand (lower import) and high demand abroad (not only for
 petroleum, but also for Norwegian goods and services) gave rise to a
 surplus on the current account. In 1990, the government oil fund was
-founded, and as noted by , changed the state of the Norwegian economy.
+founded, and as noted by @davisetal2003, changed the state of the Norwegian economy.
 The large volatility in oil prices was during the 1980s appears to have
 had a strong influence on the Norwegian economy; high oil prices
 generated huge positive net exports, while low prices had the opposite
@@ -2065,27 +2065,28 @@ notably.
 [^govpen]: The market value of the Government Pension Fund as of the second
     quarter of 2017 was 8 238 billion Norwegian kroner.
 
-As explained, by investing the surplus from the oil production abroad,
-the rate of return was independent of the Norwegian economy and the
-interest and property income of the fund could be used to stabilize the
-economy in times with low economic activity. The decision to invest the
-surplus, rather than stimulating the economy immediately, was also to
-avoid overheating the economy and to preserve the oil revenues for
-future generations. Oil revenues take several forms for the Norwegian
-*Govt*, including oil taxes, licenses for exploration, dividends from
-the co-ownership of Statoil and interest from foreign investments.
-Another important change in the structure of the Norwegian economy was
-the choice of exchange rate regime. According to , in 1978 Norway
-decided to leave the *currency snake* and link the Norwegian Krone to a
-trade-weighted basket of currencies . In the first half of the 1980s,
-much the same as for Denmark and Sweden, several devaluations were
-enacted due to reduced competitiveness of Norwegian firms. In 1986 the
-Krone was devalued again as a result of sharp reversal from a current
-account surplus to a deficit. This was caused in part by lower oil
-prices and partly due to a surge in domestic demand together with
-diminished cost competitiveness, which fueled import demand. For a brief
-period, from 1990 to 1992, the Krone was pegged to the ECU, before
-switching to a managed floating regime.
+As @davisetal2003 [p. 83] explained, by investing the surplus from the
+oil production abroad, the rate of return was independent of the
+Norwegian economy and the interest and property income of the fund could
+be used to stabilise the economy in times with low economic activity.
+The decision to invest the surplus, rather than stimulating the economy
+immediately, was also to avoid overheating the economy and to preserve
+the oil revenues for future generations. Oil revenues take several forms
+for the Norwegian *Govt*, including oil taxes, licenses for exploration,
+dividends from the co-ownership of Statoil and interest from foreign
+investments. Another important change in the structure of the Norwegian
+economy was the choice of exchange rate regime. Accoding to @NPD2013, in
+1978 Norway decided to leave the *currency snake* and link the Norwegian
+Krone to a trade-weighted basket of currencies [@alstadheim2016]. In the
+first half of the 1980s, much the same as for Denmark and Sweden,
+several devaluations were enacted due to reduced competitiveness of
+Norwegian firms. In 1986 the Krone was devalued again as a result of
+sharp reversal from a current account surplus to a deficit. This was
+caused in part by lower oil prices and partly due to a surge in domestic
+demand together with diminishied cost competitiveness, which fueled
+import demand. For a brief period, from 1990 to 1992, the Krone was
+pegged to the ECU, before switching to a managed floating regime.
+[@alstadheim2016]
 
 As stated above, the production of oil and gas created enormous revenues
 for *Govt*. This revenue, together with the income from investment
@@ -2122,7 +2123,7 @@ This description of the three countries clearly highlights some major
 changes in the Scandinavian economy, where especially the changes in the
 current account for all three countries calls on attention.
 
-Analysis
+Analysis {#sec:analysis}
 ========
 
 Correlations and business cycles -- identifying major changes in the
@@ -2163,10 +2164,10 @@ takes the *NL* of each sector and compares the variations in *NL* to
 variations in the level of capacity utilization of the domestic country.
 These two analyses are described formally below.
 
-Statistical Properties
+Statistical Properties {#sec:statprops}
 ----------------------
 
-Following the method presented in , a combination of national accounting
+Following the method presented in [@Barbosa2006], a combination of national accounting
 and statistical properties can be used to provide information on *NL*
 behaviour across the economy; in particular, how the *NL* of different
 sectors co-moves. Since the sum of *NL* across the different sectors is
@@ -2204,8 +2205,8 @@ the business cycle. The implication is that changes in *NL* of a sector
 might provide some information regarding general behavior within the
 sector relative to economic expansions and contractions.
 
-Results
--------
+Results {#sec:reults}
+=======
 
 In this section we present a descriptive analysis of our results from
 the two statistical analyses described above.
@@ -2311,7 +2312,7 @@ also negative, which has the consequence that a negative change in
 *Govt* is associated with a positive change in *Pvt*. The Swedish case
 thus provides some support for both the REH and TDH.
 
-Discussion
+Discussion {#sec:discussion}
 ==========
 
 In this section several questions are raised. Firstly, we discuss the
@@ -2367,14 +2368,35 @@ Are the correlations constant over time?
 
 Denmark
 
-
+```{r DKrollingcor, fig.cap="DK: Rolling correlation", out.width="0.85\\linewidth", fig.height=3, fig.width=7, fig.align="center", echo=FALSE, warning=FALSE, message=FALSE}
+par(mar = c(4,4,2,2))
+plot.ts(DK_rolling_ts, plot.type="single", axes=TRUE, lwd=3, lty=c(1,2,4), xlim=c(1982,2017), ylim=c(-1,1), col=c("#ffc100", "#107831", "#443eff"), ylab = "Correlation", xlab="Year")
+abline(h=0, col="#000000")
+grid()
+legend("topleft",col=c("#ffc100", "#107831", "#443eff"),
+       lwd=3,lty=c(1,2,4), legend=c("Pvt:Govt", "Pvt:RoW", "Govt:RoW"),bty='n')
+```
 
 Norway
-
+```{r NOrollingcor, fig.cap="NO: Rolling correlation", out.width="0.85\\linewidth", fig.height=3, fig.width=7, fig.align="center", echo=FALSE, warning=FALSE, message=FALSE}
+par(mar = c(4,4,2,2))
+plot.ts(NO_rolling_ts, plot.type="single", axes=TRUE, lwd=3, lty=c(1,2,4), xlim=c(1982,2017), ylim=c(-1,1), col=c("#ffc100", "#107831", "#443eff"), ylab = "Correlation", xlab="Year")
+abline(h=0, col="#000000")
+grid()
+legend("topleft",col=c("#ffc100", "#107831", "#443eff"),
+       lwd=3,lty=c(1,2,4), legend=c("Pvt:Govt", "Pvt:RoW", "Govt:RoW"),bty='n')
+```
 
 
 Sweden
-
+```{r SErollingcor, fig.cap="SE: Rolling correlation", out.width="0.85\\linewidth", fig.height=3, fig.width=7, fig.align="center", echo=FALSE, warning=FALSE, message=FALSE}
+par(mar = c(4,4,2,2))
+plot.ts(SE_rolling_ts, plot.type="single", axes=TRUE, lwd=3, lty=c(1,2,4), xlim=c(1982,2017), ylim=c(-1,1), col=c("#ffc100", "#107831", "#443eff"), ylab = "Correlation", xlab="Year")
+abline(h=0, col="#000000")
+grid()
+legend("topleft",col=c("#ffc100", "#107831", "#443eff"),
+       lwd=3,lty=c(1,2,4), legend=c("Pvt:Govt", "Pvt:RoW", "Govt:RoW"),bty='n')
+```
 Major changes in Scandinavian Economy
 -------------------------------------
 
@@ -2393,10 +2415,10 @@ Since all three economies moves from current account deficits to current
 account surpluses around 1990, this indicate a major change in all three
 economies.
 
-Conclusion
+Conclusion {#sec:conclusion}
 ==========
 
 Ds
 
-References
+References {#sec:references}
 ==========
