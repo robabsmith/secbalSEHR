@@ -11,7 +11,7 @@ author:
 date: "`r format(Sys.time(), '%B %d, %Y (%H:%M)')`"
 urlcolor: blue
 output:
-  bookdown::pdf_document2:
+  rticles::elsevier_article:
     citation_package: natbib
     fig_caption: yes
     dev: tikz
@@ -19,20 +19,26 @@ output:
     number_sections: yes
     toc: no
   bookdown::epub_book: default
-  bookdown::html_document2: default
-  bookdown::word_document2: 
-    reference_docx: mystyles.docx
   bookdown::gitbook:
     config:
       toc:
         collapse: section
     self.contained: yes
     split_by: none
-  rticles::elsevier_article: default
+  bookdown::word_document2: 
+    reference_docx: mystyles.docx
+  bookdown::html_document2: default
+  bookdown::pdf_document2:
+    citation_package: natbib
+    fig_caption: yes
+    dev: tikz
+    keep_tex: yes
+    number_sections: yes
+    toc: no
 address:
-- address: MaMTEP, Department of Business and Management, Fibigerstr{\ae}de 2, Aalborg East
+- address: MaMTEP, Department of Business and Management, Fibigerstræde 2, Aalborg East
   code: 9220
-- address: MaMTEP, Department of Business and Management, Fibigerstr{\ae}de 2, Aalborg East
+- address: MaMTEP, Department of Business and Management, Fibigerstræde 2, Aalborg East
   code: 9220
 journal: Scandinavian Economic History Review
 bibliography: Bibliography.bib
@@ -1228,7 +1234,7 @@ SE_cov_Long_3sector_melt <- melt(SE_cov_Long_3sector, id.vars = "row")
 DK_start_year <- 1975
 NO_start_year <- 1978
 SE_start_year <- 1950
-years_rolling <- 8
+years_rolling <- 4
 
 #############################################################################
 ## DK
@@ -1242,9 +1248,9 @@ DK_rolling_P_G = matrix(as.numeric(unlist(DK_rolling_P_G)),ncol=2)
 DK_rolling_P_R = matrix(as.numeric(unlist(DK_rolling_P_R)),ncol=2)
 DK_rolling_G_R = matrix(as.numeric(unlist(DK_rolling_G_R)),ncol=2)
 
-DK_rolling_result_P_G <- roll_cor(DK_rolling_P_G, years_rolling)
-DK_rolling_result_P_R <- roll_cor(DK_rolling_P_R, years_rolling)
-DK_rolling_result_G_R <- roll_cor(DK_rolling_G_R, years_rolling)
+DK_rolling_result_P_G <- roll_cor(DK_rolling_P_G, width=years_rolling)
+DK_rolling_result_P_R <- roll_cor(DK_rolling_P_R, width=years_rolling)
+DK_rolling_result_G_R <- roll_cor(DK_rolling_G_R, width=years_rolling)
 
 DK_rolling_plot_P_G <- DK_rolling_result_P_G[2, 1, ]
 DK_rolling_plot_P_R <- DK_rolling_result_P_R[2, 1, ]
@@ -1270,9 +1276,9 @@ NO_rolling_P_G = matrix(as.numeric(unlist(NO_rolling_P_G)),ncol=2)
 NO_rolling_P_R = matrix(as.numeric(unlist(NO_rolling_P_R)),ncol=2)
 NO_rolling_G_R = matrix(as.numeric(unlist(NO_rolling_G_R)),ncol=2)
 
-NO_rolling_result_P_G <- roll_cor(NO_rolling_P_G, years_rolling)
-NO_rolling_result_P_R <- roll_cor(NO_rolling_P_R, years_rolling)
-NO_rolling_result_G_R <- roll_cor(NO_rolling_G_R, years_rolling)
+NO_rolling_result_P_G <- roll_cor(NO_rolling_P_G, width=years_rolling)
+NO_rolling_result_P_R <- roll_cor(NO_rolling_P_R, width=years_rolling)
+NO_rolling_result_G_R <- roll_cor(NO_rolling_G_R, width=years_rolling)
 
 NO_rolling_plot_P_G <- NO_rolling_result_P_G[2, 1, ]
 NO_rolling_plot_P_R <- NO_rolling_result_P_R[2, 1, ]
@@ -1298,9 +1304,9 @@ SE_rolling_P_G = matrix(as.numeric(unlist(SE_rolling_P_G)),ncol=2)
 SE_rolling_P_R = matrix(as.numeric(unlist(SE_rolling_P_R)),ncol=2)
 SE_rolling_G_R = matrix(as.numeric(unlist(SE_rolling_G_R)),ncol=2)
 
-SE_rolling_result_P_G <- roll_cor(SE_rolling_P_G, (years_rolling))
-SE_rolling_result_P_R <- roll_cor(SE_rolling_P_R, (years_rolling))
-SE_rolling_result_G_R <- roll_cor(SE_rolling_G_R, (years_rolling))
+SE_rolling_result_P_G <- roll_cor(SE_rolling_P_G, width=years_rolling)
+SE_rolling_result_P_R <- roll_cor(SE_rolling_P_R, width=years_rolling)
+SE_rolling_result_G_R <- roll_cor(SE_rolling_G_R, width=years_rolling)
 
 SE_rolling_plot_P_G <- SE_rolling_result_P_G[2, 1, ]
 SE_rolling_plot_P_R <- SE_rolling_result_P_R[2, 1, ]
@@ -1317,6 +1323,12 @@ SE_rolling_ts <- ts(SE_rolling_ts, start=(SE_start_year+years_rolling), freq=1)
 # Save the default plot settings
 
 ```
+
+<!-- To knit this file you will need to install pandoc-citeproc -->
+<!-- To knit this file you will need to install pandoc-citeproc -->
+<!-- To do this run from the terminal: $ brew install pandoc-citeproc -->
+<!-- To knit this file you will need to install pandoc-citeproc -->
+<!-- To knit this file you will need to install pandoc-citeproc -->
 
 [^mikael]: Permanent address: MaMTEP, Department of Business and Management, 
     Aalborg University, Fibigerstræde 2, Aalborg East, 
@@ -2422,3 +2434,5 @@ Ds
 
 References {#sec:references}
 ==========
+
+
